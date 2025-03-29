@@ -1,4 +1,4 @@
-##MooMoo.io macro
+## MooMoo.io macro
 
 - **Controls:**
 - [SHIFT] soldier hat
