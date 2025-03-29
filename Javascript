@@ -71,7 +71,7 @@ function handleMessage(_0x1e1182) {
         data = temp;
     }
     function doMaxHeal() {
-        for (let i = 0; i < Math.ceil((100 - data[2]) / 20); i++) {
+        for (let i = 0; i < Math.ceil(Math.min(100 - data[2]) / 40); i++) {
             cplace(foodType);
         }
     }
