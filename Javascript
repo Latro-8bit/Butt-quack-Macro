@@ -1,0 +1,201 @@
+// ==UserScript==
+// @name         ButtQuack Holder WS Macro
+// @namespace    http://tampermonkey.net/
+// @version      2025-03-23
+// @description  macros for spikes(r), trap(f), soldier(g), tank(RMB), bull(v).
+// @author       latro
+// @icon         https://media.discordapp.net/attachments/1319458277695688704/1353359277259100312/Quack.png?ex=67e15d8b&is=67e00c0b&hm=b59c2c273309780bd90a73f783f7d716f7f16ee5f9d579552cfa40da767b0ae5&=&format=webp&quality=lossless
+// @match        *://*.moomoo.io/*
+// @require      https://cdn.jsdelivr.net/npm/msgpack-lite@0.1.26/dist/msgpack.min.js
+// @grant        none
+// ==/UserScript==
+
+var ws;
+var boostType;
+var spikeType;
+var foodType;
+var primary;
+var secondary;
+var prim;
+let um = 0;
+const myPlayer = {
+  id: null,
+  x: null,
+  y: null,
+  "dir": null,
+  "object": null,
+  "weapon": null,
+  "clan": null,
+  isLeader: null,
+  hat: null,
+  "accessory": null,
+  isSkull: null
+};
+let whereverifybutton = document.querySelector("#altcha_checkbox");
+function clicktheverify() {
+  if (whereverifybutton) {
+    whereverifybutton.click();
+  }
+}
+setInterval(clicktheverify, 1000);
+document.msgpack = msgpack;
+function n() {
+  this.buffer = new Uint8Array([0]);
+  this.buffer.__proto__ = new Uint8Array();
+  this.type = 0;
+}
+WebSocket.prototype.oldSend = WebSocket.prototype.send;
+WebSocket.prototype.send = function (m) {
+  if (!ws) {
+    document.ws = this;
+    ws = this;
+    socketFound(this);
+  }
+  this.oldSend(m);
+};
+function socketFound(socket) {
+  socket.addEventListener("message", function (_0x1ff389) {
+    handleMessage(_0x1ff389);
+  });
+}
+
+function handleMessage(_0x1e1182) {
+    let temp = msgpack.decode(new Uint8Array(_0x1e1182.data));
+    let data;
+    if (temp.length > 1) {
+        data = [temp[0], ...temp[1]];
+        if (data[1] instanceof Array) {
+            data = data;
+        }
+    } else {
+        data = temp;
+    }
+    function doMaxHeal() {
+        for (let i = 0; i < Math.ceil((100 - data[2]) / 20); i++) {
+            cplace(foodType);
+        }
+    }
+    let healTimeout = (1.56*data[2]);
+    function slowHeal(timeout) {
+        setTimeout(() =>{
+            doMaxHeal();
+        },timeout);
+    }
+    let item = data[0];
+    if(!data) {return};
+    update();
+    if (item == 'C' && true) {
+        myPlayer.id = data[1];
+    }
+    if (um == 1){
+        if (item == 'O'&& data[2] < 100 && data[2] > 0 && data[1] == myPlayer.id) {
+            slowHeal(healTimeout);
+            console.log(healTimeout);
+        }
+    }
+    if (item == "a") {
+        for (let i = 0; i < data[1].length / 13; i++) {
+            let playerInfo = data[1].slice(13 * i, 13 * i + 13);
+            if (playerInfo[0] == myPlayer.id) {
+                myPlayer.x = playerInfo[1];
+                myPlayer.y = playerInfo[2];
+                myPlayer.dir = playerInfo[3];
+                myPlayer.object = playerInfo[4];
+                myPlayer.weapon = playerInfo[5];
+                myPlayer.clan = playerInfo[7];
+                myPlayer.isLeader = playerInfo[8];
+                myPlayer.hat = playerInfo[9];
+                myPlayer.accessory = playerInfo[10];
+                myPlayer.isSkull = playerInfo[11];
+            } else if(playerInfo[7] != myPlayer.clan || playerInfo[7] === null){
+                console.log(false);
+            }
+        }
+    }
+    update();
+}
+function place(item) {
+  //doNewSend(['z', [_0x34ad4e, null]]);
+  ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [item, null]]))));
+  //doNewSend(['z', [null, true]]);
+  //ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [null, true]]))));
+}
+function cplace(item) {
+  ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [item, null]]))));
+  ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [1, null]]))));
+  ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [0, null]]))));
+  ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [myPlayer.weapon, true]]))));
+
+}
+
+document.addEventListener('keydown', event => {
+  if (["allianceinput", 'chatbox', "nameinput", "storeHolder"].includes(document.activeElement.id.toLowerCase())) {
+    return null;
+  }
+    //hold
+  if (event.keyCode == 82 && document.activeElement.id.toLowerCase() !== "chatbox") {
+    place(spikeType);//press r
+  }
+  if (event.keyCode == 70 && document.activeElement.id.toLowerCase() !== "chatbox") {
+    place(boostType);//press f
+  }
+  if (event.keyCode == 80 && document.activeElement.id.toLowerCase() !== "chatbox") {
+      if(um == 0){
+          um = 1
+      } else{um = 0}
+      console.log("UMMMM!!!");
+  }
+  if (event.keyCode == 86 && document.activeElement.id.toLowerCase() !== "chatbox") {
+    ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 7, 0]]))));//press v for bull
+  }
+  if (event.keyCode == 71 && document.activeElement.id.toLowerCase() !== "chatbox") {
+    ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 0, 0]]))));//press g for NOTHING
+  }
+  if (event.keyCode == 16 && document.activeElement.id.toLowerCase() !== "chatbox") {
+    ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 6, 0]]))));//press shift for Soldier
+  }
+});
+
+document.addEventListener("mousedown", event => {
+    if(event.button == 2 && document.activeElement.id.toLowerCase() !== 'chatbox'){
+    ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 40, 0]]))));//press mouse btn 0 for tank
+    }
+});
+document.addEventListener("mouseup", event => {
+    if(event.button == 2 && document.activeElement.id.toLowerCase() !== 'chatbox'){
+    ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 0, 0]]))));//press mouse btn 0 for tank
+    }
+});
+document.addEventListener("wheel", event => {
+    ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [1, null]]))));
+    ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [0, null]]))));
+
+});
+function update() {
+    for (let i=0;i<9;i++){
+        if (document.getElementById('actionBarItem' + i.toString()).offsetParent !== null) {
+            primary = i;
+        }
+    }
+
+    for (let i=9;i<16;i++){
+        if (document.getElementById('actionBarItem' + i.toString()).offsetParent !== null) {
+            secondary = i;
+        }
+    }
+  for (let i = 22; i < 26; i++) {
+    if (document.getElementById('actionBarItem' + i.toString()).offsetParent !== null) {
+      spikeType = i - 16;
+    }
+  }
+  for (let i = 31; i < 33; i++) {
+    if (document.getElementById("actionBarItem" + i.toString()).offsetParent !== null) {
+      boostType = i - 16;
+    }
+  }
+  for (let i = 16; i < 19; i++) {
+    if (document.getElementById("actionBarItem" + i.toString()).offsetParent !== null) {
+      foodType = i - 16;
+    }
+  }
+}
