@@ -1,8 +1,9 @@
-MooMoo.io macro
+##MooMoo.io macro
 
-[SHIFT] soldier hat
-[R] hold spike
-[F] hold trap
-[G] unequip
-[V] Bull helmet
-Hold [RMB] for tank helmet
+- **Controls:**
+- [SHIFT] soldier hat
+- [R] hold spike
+- [F] hold trap
+- [G] unequip
+- [V] Bull helmet
+- Hold [RMB] for tank helmet
