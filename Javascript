@@ -9,7 +9,6 @@
 // @require      https://cdn.jsdelivr.net/npm/msgpack-lite@0.1.26/dist/msgpack.min.js
 // @grant        none
 // ==/UserScript==
-
 var ws;
 var boostType;
 var spikeType;
@@ -71,11 +70,11 @@ function handleMessage(_0x1e1182) {
         data = temp;
     }
     function doMaxHeal() {
-        for (let i = 0; i < Math.ceil(Math.min(100 - data[2]) / 40); i++) {
+        for (let i = 0; i < Math.ceil(Math.min(100 - data[2]) / 20); i++) {
             cplace(foodType);
         }
     }
-    let healTimeout = (1.56*data[2]);
+    let healTimeout = (1.6*data[2]);
     function slowHeal(timeout) {
         setTimeout(() =>{
             doMaxHeal();
@@ -108,7 +107,7 @@ function handleMessage(_0x1e1182) {
                 myPlayer.accessory = playerInfo[10];
                 myPlayer.isSkull = playerInfo[11];
             } else if(playerInfo[7] != myPlayer.clan || playerInfo[7] === null){
-                console.log(false);
+                //console.log(false);
             }
         }
     }
@@ -127,7 +126,21 @@ function cplace(item) {
   ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [myPlayer.weapon, true]]))));
 
 }
-
+let config = window.config;
+let game = {
+    tick: 0,
+    tickQueue: [],
+    tickBase: function(set, tick) {
+        if (this.tickQueue[this.tick + tick]) {
+            this.tickQueue[this.tick + tick].push(set);
+        } else {
+            this.tickQueue[this.tick + tick] = [set];
+        }
+    },
+    tickRate: (1000 / config.serverUpdateRate),
+    tickSpeed: 0,
+    lastTick: performance.now()
+};
 document.addEventListener('keydown', event => {
   if (["allianceinput", 'chatbox', "nameinput", "storeHolder"].includes(document.activeElement.id.toLowerCase())) {
     return null;
@@ -143,10 +156,27 @@ document.addEventListener('keydown', event => {
       if(um == 0){
           um = 1
       } else{um = 0}
-      console.log("UMMMM!!!");
+      console.log(um);
   }
   if (event.keyCode == 86 && document.activeElement.id.toLowerCase() !== "chatbox") {
-    ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 7, 0]]))));//press v for bull
+      ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 53, 0]]))));
+      ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [1, null]]))));
+      ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [0, null]]))));
+      ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [secondary, true]]))));
+
+      setTimeout(() => {//time wait
+          ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 7, 0]]))));//press v for bull
+          ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [primary, true]]))));
+          ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [1, null]]))));
+          ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [0, null]]))));
+          setTimeout(() => {//time
+              ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 53, 0]]))));
+              ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [myPlayer.weapon, true]]))));
+              setTimeout(() => {//time
+                  ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 6, 0]]))));
+              }, 160);
+          }, 160);
+      }, 90);
   }
   if (event.keyCode == 71 && document.activeElement.id.toLowerCase() !== "chatbox") {
     ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 0, 0]]))));//press g for NOTHING
@@ -154,21 +184,25 @@ document.addEventListener('keydown', event => {
   if (event.keyCode == 16 && document.activeElement.id.toLowerCase() !== "chatbox") {
     ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 6, 0]]))));//press shift for Soldier
   }
+    if (event.keyCode == 92 && document.activeElement.id.toLowerCase() !== "chatbox") {
+        ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 40, 0]]))));//press \ for tank
+  }
+
 });
 
 document.addEventListener("mousedown", event => {
     if(event.button == 2 && document.activeElement.id.toLowerCase() !== 'chatbox'){
-    ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 40, 0]]))));//press mouse btn 0 for tank
+    ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [secondary, true]]))));
     }
 });
 document.addEventListener("mouseup", event => {
     if(event.button == 2 && document.activeElement.id.toLowerCase() !== 'chatbox'){
-    ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 0, 0]]))));//press mouse btn 0 for tank
+    ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [primary, true]]))));
     }
 });
 document.addEventListener("wheel", event => {
-    ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [1, null]]))));
-    ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [0, null]]))));
+    //ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [1, null]]))));
+   // ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [0, null]]))));
 
 });
 function update() {
