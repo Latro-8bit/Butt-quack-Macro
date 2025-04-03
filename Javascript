@@ -4,7 +4,7 @@
 // @version      2025-03-23
 // @description  macros for spikes(r), trap(f), soldier(g), tank(RMB), bull(v).
 // @author       latro
-// @icon         https://media.discordapp.net/attachments/1319458277695688704/1353359277259100312/Quack.png?ex=67e15d8b&is=67e00c0b&hm=b59c2c273309780bd90a73f783f7d716f7f16ee5f9d579552cfa40da767b0ae5&=&format=webp&quality=lossless
+// @icon         https://i.imgur.com/LdtQYdJ_d.webp?maxwidth=760&fidelity=grand
 // @match        *://*.moomoo.io/*
 // @require      https://cdn.jsdelivr.net/npm/msgpack-lite@0.1.26/dist/msgpack.min.js
 // @grant        none
@@ -16,6 +16,7 @@ var foodType;
 var primary;
 var secondary;
 var prim;
+var shame = 0;
 let um = 0;
 const myPlayer = {
   id: null,
@@ -57,7 +58,6 @@ function socketFound(socket) {
     handleMessage(_0x1ff389);
   });
 }
-
 function handleMessage(_0x1e1182) {
     let temp = msgpack.decode(new Uint8Array(_0x1e1182.data));
     let data;
@@ -74,7 +74,7 @@ function handleMessage(_0x1e1182) {
             cplace(foodType);
         }
     }
-    let healTimeout = (1.6*data[2]);
+    let healTimeout;
     function slowHeal(timeout) {
         setTimeout(() =>{
             doMaxHeal();
@@ -88,8 +88,9 @@ function handleMessage(_0x1e1182) {
     }
     if (um == 1){
         if (item == 'O'&& data[2] < 100 && data[2] > 0 && data[1] == myPlayer.id) {
+            healTimeout = (data[2] + window.pingTime + 25);
             slowHeal(healTimeout);
-            console.log(healTimeout);
+            console.log(window.pingTime);
         }
     }
     if (item == "a") {
@@ -126,21 +127,7 @@ function cplace(item) {
   ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [myPlayer.weapon, true]]))));
 
 }
-let config = window.config;
-let game = {
-    tick: 0,
-    tickQueue: [],
-    tickBase: function(set, tick) {
-        if (this.tickQueue[this.tick + tick]) {
-            this.tickQueue[this.tick + tick].push(set);
-        } else {
-            this.tickQueue[this.tick + tick] = [set];
-        }
-    },
-    tickRate: (1000 / config.serverUpdateRate),
-    tickSpeed: 0,
-    lastTick: performance.now()
-};
+
 document.addEventListener('keydown', event => {
   if (["allianceinput", 'chatbox', "nameinput", "storeHolder"].includes(document.activeElement.id.toLowerCase())) {
     return null;
@@ -178,15 +165,15 @@ document.addEventListener('keydown', event => {
           }, 160);
       }, 90);
   }
-  if (event.keyCode == 71 && document.activeElement.id.toLowerCase() !== "chatbox") {
-    ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 0, 0]]))));//press g for NOTHING
-  }
-  if (event.keyCode == 16 && document.activeElement.id.toLowerCase() !== "chatbox") {
-    ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 6, 0]]))));//press shift for Soldier
-  }
-    if (event.keyCode == 92 && document.activeElement.id.toLowerCase() !== "chatbox") {
-        ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 40, 0]]))));//press \ for tank
-  }
+    if (event.keyCode == 71 && document.activeElement.id.toLowerCase() !== "chatbox") {
+        ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 0, 0]]))));//press g for NOTHING
+    }
+    if (event.keyCode == 16 && document.activeElement.id.toLowerCase() !== "chatbox") {
+        ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 6, 0]]))));//press shift for Soldier
+    }
+    if (event.keyCode == 17 && document.activeElement.id.toLowerCase() !== "chatbox") {
+        ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 40, 0]]))));//press ctrl for tank
+    }
 
 });
 
