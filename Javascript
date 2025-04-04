@@ -2,7 +2,7 @@
 // @name         ButtQuack Holder WS Macro
 // @namespace    http://tampermonkey.net/
 // @version      2025-03-23
-// @description  macros for spikes(r), trap(f), soldier(g), tank(RMB), bull(v).
+// @description  macros for spikes(r), trap(f), soldier(shift), tank(z), .
 // @author       latro
 // @icon         https://i.imgur.com/LdtQYdJ_d.webp?maxwidth=760&fidelity=grand
 // @match        *://*.moomoo.io/*
@@ -90,7 +90,6 @@ function handleMessage(_0x1e1182) {
         if (item == 'O'&& data[2] < 100 && data[2] > 0 && data[1] == myPlayer.id) {
             healTimeout = (data[2] + window.pingTime + 25);
             slowHeal(healTimeout);
-            console.log(window.pingTime);
         }
     }
     if (item == "a") {
@@ -171,20 +170,24 @@ document.addEventListener('keydown', event => {
     if (event.keyCode == 16 && document.activeElement.id.toLowerCase() !== "chatbox") {
         ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 6, 0]]))));//press shift for Soldier
     }
-    if (event.keyCode == 17 && document.activeElement.id.toLowerCase() !== "chatbox") {
-        ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 40, 0]]))));//press ctrl for tank
+    if (event.keyCode == 90 && document.activeElement.id.toLowerCase() !== "chatbox") {
+        ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 40, 0]]))));//press Z for tank
+
     }
 
 });
-
+let oldWeapon = myPlayer.weapon;
 document.addEventListener("mousedown", event => {
+    oldWeapon = myPlayer.weapon;
     if(event.button == 2 && document.activeElement.id.toLowerCase() !== 'chatbox'){
-    ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [secondary, true]]))));
+        ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [secondary, true]]))));
+        ws.send(new Uint8Array(Array.from(msgpack.encode(['K', [1, 1]]))));
     }
 });
 document.addEventListener("mouseup", event => {
     if(event.button == 2 && document.activeElement.id.toLowerCase() !== 'chatbox'){
-    ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [primary, true]]))));
+        ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [oldWeapon, true]]))));
+        ws.send(new Uint8Array(Array.from(msgpack.encode(['K', [1, 1]]))));
     }
 });
 document.addEventListener("wheel", event => {
