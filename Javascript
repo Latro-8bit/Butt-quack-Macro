@@ -13,11 +13,14 @@ var ws;
 var boostType;
 var spikeType;
 var foodType;
+var turretType;
+var millType;
 var primary;
 var secondary;
 var prim;
 var shame = 0;
-let um = 0;
+let heal = false;
+var placerOn = false;
 const myPlayer = {
   id: null,
   x: null,
@@ -86,7 +89,7 @@ function handleMessage(_0x1e1182) {
     if (item == 'C' && true) {
         myPlayer.id = data[1];
     }
-    if (um == 1){
+    if (heal == 1){
         if (item == 'O'&& data[2] < 100 && data[2] > 0 && data[1] == myPlayer.id) {
             healTimeout = (data[2] + window.pingTime + 25);
             slowHeal(healTimeout);
@@ -113,6 +116,7 @@ function handleMessage(_0x1e1182) {
     }
     update();
 }
+
 function place(item) {
   //doNewSend(['z', [_0x34ad4e, null]]);
   ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [item, null]]))));
@@ -126,34 +130,92 @@ function cplace(item) {
   ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [myPlayer.weapon, true]]))));
 
 }
-
+let placed = false;
+var repeater = function (_0x33a0aa, _0x5c57c6, _0x57f727, _0x11bcc3) {
+  let _0x793543 = false;
+  let _0x154079 = undefined;
+  return {
+    'start'(_0x5c036d) {
+      if (_0x5c036d == _0x33a0aa && document.activeElement.id.toLowerCase() !== 'chatbox') {
+        placed = true;
+        _0x793543 = true;
+        if (_0x154079 === undefined) {
+          _0x154079 = setInterval(() => {
+            _0x5c57c6();
+            if (!_0x793543) {
+              clearInterval(_0x154079);
+              _0x154079 = undefined;
+              console.log("claered");
+            }
+          }, _0x57f727);
+        }
+      }
+    },
+    'stop'(_0x533b4e) {
+      if (_0x533b4e == _0x33a0aa && document.activeElement.id.toLowerCase() !== "chatbox") {
+        placed = false;
+        _0x793543 = false;
+      }
+    }
+  };
+};
+const boostPlacer = repeater(70, () => {
+  cplace(boostType);
+}, 45);
+const millPlacer = repeater(78, () => {
+  cplace(millType);
+}, 65);
+const placers = [boostPlacer, millPlacer];
 document.addEventListener('keydown', event => {
-  if (["allianceinput", 'chatbox', "nameinput", "storeHolder"].includes(document.activeElement.id.toLowerCase())) {
-    return null;
-  }
-    //hold
-  if (event.keyCode == 82 && document.activeElement.id.toLowerCase() !== "chatbox") {
-    place(spikeType);//press r
-  }
-  if (event.keyCode == 70 && document.activeElement.id.toLowerCase() !== "chatbox") {
-    place(boostType);//press f
-  }
-  if (event.keyCode == 80 && document.activeElement.id.toLowerCase() !== "chatbox") {
-      if(um == 0){
-          um = 1
-      } else{um = 0}
-      console.log(um);
-  }
-  if (event.keyCode == 86 && document.activeElement.id.toLowerCase() !== "chatbox") {
-      ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 53, 0]]))));
-      ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [1, null]]))));
-      ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [0, null]]))));
-      ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [secondary, true]]))));
+    if (["allianceinput", 'chatbox', "nameinput", "storeHolder"].includes(document.activeElement.id.toLowerCase())) {
+        return null;
+    }
+    if(placerOn == true){
+        placers.forEach(_0x3101a9 => {
+            _0x3101a9.start(event.keyCode);
+        });
+    }
+    if (event.keyCode == 82 && document.activeElement.id.toLowerCase() !== "chatbox") {
+        //press r
 
-      setTimeout(() => {//time wait
-          ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 7, 0]]))));//press v for bull
-          ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [primary, true]]))));
-          ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [1, null]]))));
+        place(spikeType);
+
+    }
+    if (event.keyCode == 70 && document.activeElement.id.toLowerCase() !== "chatbox") {
+        //press f
+        if(placerOn == false){
+            place(boostType);
+        }
+
+    }
+    if (event.keyCode == 72 && document.activeElement.id.toLowerCase() !== "chatbox") {
+        //press h
+        place(turretType);
+
+    }
+    if (event.keyCode == 76 && document.activeElement.id.toLowerCase() !== "chatbox") {
+        if(placerOn == false){
+            placerOn = true
+        } else{placerOn = false}
+        console.log("placer " + placerOn);
+    }
+
+    if (event.keyCode == 80 && document.activeElement.id.toLowerCase() !== "chatbox") {
+        if(heal == false){
+            heal = true
+        } else{heal = false}
+        console.log("healer " + heal);
+    }
+    if (event.keyCode == 86 && document.activeElement.id.toLowerCase() !== "chatbox") {
+        ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 53, 0]]))));
+        ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [1, null]]))));
+        ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [0, null]]))));
+        ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [secondary, true]]))));
+
+        setTimeout(() => {//time wait
+            ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 7, 0]]))));//press v for bull
+            ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [primary, true]]))));
+            ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [1, null]]))));
           ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [0, null]]))));
           setTimeout(() => {//time
               ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 53, 0]]))));
@@ -175,6 +237,14 @@ document.addEventListener('keydown', event => {
 
     }
 
+});
+document.addEventListener('keyup', event => {
+  if (["allianceinput", "chatbox", "nameinput", "storeHolder"].includes(document.activeElement.id.toLowerCase())) {
+    return null;
+  }
+  placers.forEach(_0x5c698d => {
+    _0x5c698d.stop(event.keyCode);
+  });
 });
 let oldWeapon = myPlayer.weapon;
 document.addEventListener("mousedown", event => {
@@ -218,8 +288,18 @@ function update() {
     }
   }
   for (let i = 16; i < 19; i++) {
-    if (document.getElementById("actionBarItem" + i.toString()).offsetParent !== null) {
-      foodType = i - 16;
+      if (document.getElementById("actionBarItem" + i.toString()).offsetParent !== null) {
+          foodType = i - 16;
+      }
+  }
+    for (let i = 33; i < 36; i++) {
+        if (document.getElementById('actionBarItem' + i.toString()).offsetParent !== null) {
+            turretType = i - 16;
+        }
     }
+    for (let i = 26; i < 29; i++) {
+        if (document.getElementById("actionBarItem" + i.toString()).offsetParent !== null) {
+            millType = i - 16;
+        }
   }
 }
