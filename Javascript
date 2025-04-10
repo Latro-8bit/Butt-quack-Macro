@@ -13,9 +13,8 @@
 //keybinds
 var spikeKey = "r";
 var boostKey = "f";
-var turretKey = "h"; //does rrly work
+var turretKey = "h"; //doents rrly work
 var millKey = "n";
-
 var ws;
 var boostType;
 var spikeType;
@@ -62,20 +61,30 @@ menu.innerHTML = `<div class="MacroMenu-container">
             <input type="text" id="millInput" maxlength="1" pattern="[A-Za-z]" oninput="this.value = this.value.replace(/[^A-Za-z]/g, '')"  value="${millKey}">
 
         </div>
+        <div class="MacroMenu-input">
+            <label style="color: white;">Healer: </label>
+            <span id="healer" style= "color: #cc5151;">FALSE</span>
+        </div>
+        <div class="MacroMenu-input">
+            <label style="color: white;">Placer: </label>
+            <span id="placer" style="color: #cc5151;">FALSE</span>
+        </div>
 </div>`;
+menu.style.fontFamily = "'Hammersmith One, sans-serif'";
 menu.style.position = "absolute";
 menu.style.top = "10px";
 menu.style.left = "10px";
 menu.style.padding = "10px";
-menu.style.backgroundColor = "#00000046";
-menu.style.border = "1.5px solid #00000046";
+menu.style.backgroundColor = "#00000000";
+menu.style.border = "1.5px solid #00000000";
 menu.style.borderRadius = "4px";
-menu.style.boxShadow = "0 2px 4px rgba(0,0,0,0.2)";
+menu.style.boxShadow = "0 2px 4px rgba(0,0,0,0)";
 menu.style.zIndex = "9999";
 menu.style.display = "none";
 menu.style.maxWidth = "200px";
 
 const style = document.createElement("style");
+//CSS
 style.innerHTML = `
     .MacroMenu-container h1 {
         margin: 0;
@@ -92,6 +101,17 @@ style.innerHTML = `
     .MacroMenu-input label {
         width: 200px;
         font-size: 18px;
+    }
+    .MacroMenu-input span {
+        font-size: 18px;
+        text-transform: uppercase;
+          text-shadow:
+    -0.7px -0.7px 0 #000,
+    0.7px -0.7px 0 #000,
+    -0.7px 0.7px 0 #000,
+    0.7px 0.7px 0 #000;
+
+
     }
     .MacroMenu-input input {
         flex: 1;
@@ -116,6 +136,16 @@ function clicktheverify() {
   if (whereverifybutton) {
     whereverifybutton.click();
   }
+}
+
+function change(id, tog){
+    const element = document.getElementById(id);
+    element.textContent = (tog); // Change text
+    if (tog === "true" || tog === true) {
+        element.style.color = "#8ecc51";
+    }else{
+        element.style.color = "#cc5151";
+    }
 }
 setInterval(clicktheverify, 1000);
 document.msgpack = msgpack;
@@ -236,6 +266,7 @@ var repeater = function (_0x33a0aa, _0x5c57c6, _0x57f727, _0x11bcc3) {
     }
   };
 };
+
 const boostPlacer = repeater(boostKey, () => {
   cplace(boostType);
 }, 45);
@@ -281,14 +312,30 @@ document.addEventListener('keydown', event => {
         if(placerOn == false){
             placerOn = true
         } else{placerOn = false}
-        console.log("placer " + placerOn);
+        change('placer', placerOn);
     }
+    if (event.keyCode == 86 && document.activeElement.id.toLowerCase() !== "chatbox") {
+        ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 53, 0]]))));
+        ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [1, null]]))));
+        ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [0, null]]))));
+        ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [secondary, true]]))));
 
+        setTimeout(() => {//time wait
+            ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 7, 0]]))));//press v for bull
+            ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [primary, true]]))));
+            ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [1, null]]))));
+            ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [0, null]]))));
+            setTimeout(() => {//time reset
+                ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 6, 0]]))));
+                ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [myPlayer.weapon, true]]))));
+            }, 70);
+        }, 90);
+    }
     if (event.keyCode == 80 && document.activeElement.id.toLowerCase() !== "chatbox") {
         if(heal == false){
             heal = true
         } else{heal = false}
-        console.log("healer " + heal);
+        change('healer', heal);
     }
     if (event.keyCode == 71 && document.activeElement.id.toLowerCase() !== "chatbox") {
         ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 0, 0]]))));//press g for NOTHING
