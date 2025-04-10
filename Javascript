@@ -121,7 +121,8 @@ style.innerHTML = `
         border: 1px solid #ddd;
         border-radius: 4px;
         font-size: 16px;
-        width: 20px;
+        width: 10px;
+        height: 10px;
     }`;
 
 document.head.appendChild(style);
@@ -359,6 +360,14 @@ document.addEventListener('keydown', event => {
     }
     if (event.keyCode == 90 && document.activeElement.id.toLowerCase() !== "chatbox") {
         ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 40, 0]]))));//press Z for tank
+
+    }
+    if (event.keyCode == 66 && document.activeElement.id.toLowerCase() !== "chatbox") {
+        if(myPlayer.accessory != 11){
+            ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 11, 1]]))));//press B for monkey
+        } else{
+             ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 0, 1]]))));
+        }
 
     }
 
