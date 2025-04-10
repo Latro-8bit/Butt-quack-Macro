@@ -16,7 +16,11 @@ var spikeKey = "r";
 var boostKey = "f";
 var turretKey = "h"; //doents rrly work
 var millKey = "n";
+let mouseX;
+let mouseY;
 
+let width;
+let height;
 var ws;
 var boostType;
 var spikeType;
@@ -152,11 +156,7 @@ function change(id, tog){
 }
 setInterval(clicktheverify, 1000);
 document.msgpack = msgpack;
-function n() {
-  this.buffer = new Uint8Array([0]);
-  this.buffer.__proto__ = new Uint8Array();
-  this.type = 0;
-}
+
 WebSocket.prototype.oldSend = WebSocket.prototype.send;
 WebSocket.prototype.send = function (m) {
   if (!ws) {
@@ -233,7 +233,7 @@ function place(item) {
   //doNewSend(['z', [null, true]]);
   //ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [null, true]]))));
 }
-function cplace(item, angle = null) {
+function cplace(item, angle = Math.atan2(mouseY - height / 2, mouseX - width / 2)) {
   ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [item, null]]))));
   ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [1, angle]]))));
   ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [0, angle]]))));
@@ -272,10 +272,10 @@ var repeater = function (_0x33a0aa, _0x5c57c6, _0x57f727, _0x11bcc3) {
 
 const boostPlacer = repeater(boostKey, () => {
   cplace(boostType);
-}, 45);
+}, 65);
 const spikePlacer = repeater(spikeKey, () => {
   cplace(spikeType);
-}, 45);
+}, 65);
 const millPlacer = repeater(millKey, () => {
   cplace(millType);
 }, 65);
