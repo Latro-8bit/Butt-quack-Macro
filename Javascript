@@ -322,23 +322,6 @@ document.addEventListener('keydown', event => {
         } else{placerOn = false}
         change('placer', placerOn);
     }
-    if (event.keyCode == 86 && document.activeElement.id.toLowerCase() !== "chatbox") {
-        ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 53, 0]]))));
-        ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [1, null]]))));
-        ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [0, null]]))));
-        ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [secondary, true]]))));
-
-        setTimeout(() => {//time wait
-            ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 7, 0]]))));//press v for bull
-            ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [primary, true]]))));
-            ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [1, null]]))));
-            ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [0, null]]))));
-            setTimeout(() => {//time reset
-                ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 6, 0]]))));
-                ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [myPlayer.weapon, true]]))));
-            }, 70);
-        }, 120);
-    }
     if (event.keyCode == 80 && document.activeElement.id.toLowerCase() !== "chatbox") {
         if(heal == false){
             heal = true
