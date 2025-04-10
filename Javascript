@@ -7,6 +7,7 @@
 // @icon         https://i.imgur.com/LdtQYdJ_d.webp?maxwidth=760&fidelity=grand
 // @match        *://*.moomoo.io/*
 // @require      https://cdn.jsdelivr.net/npm/msgpack-lite@0.1.26/dist/msgpack.min.js
+
 // @grant        none
 // ==/UserScript==
 
@@ -15,6 +16,7 @@ var spikeKey = "r";
 var boostKey = "f";
 var turretKey = "h"; //doents rrly work
 var millKey = "n";
+
 var ws;
 var boostType;
 var spikeType;
@@ -203,6 +205,7 @@ function handleMessage(_0x1e1182) {
         }
     }
     if (item == "a") {
+        //enemiesNear = [];
         for (let i = 0; i < data[1].length / 13; i++) {
             let playerInfo = data[1].slice(13 * i, 13 * i + 13);
             if (playerInfo[0] == myPlayer.id) {
@@ -217,23 +220,22 @@ function handleMessage(_0x1e1182) {
                 myPlayer.accessory = playerInfo[10];
                 myPlayer.isSkull = playerInfo[11];
             } else if(playerInfo[7] != myPlayer.clan || playerInfo[7] === null){
-                //console.log(false);
+                //enemiesNear.push(playerInfo);
             }
         }
     }
     update();
 }
-
 function place(item) {
   //doNewSend(['z', [_0x34ad4e, null]]);
   ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [item, null]]))));
   //doNewSend(['z', [null, true]]);
   //ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [null, true]]))));
 }
-function cplace(item) {
+function cplace(item, angle = null) {
   ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [item, null]]))));
-  ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [1, null]]))));
-  ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [0, null]]))));
+  ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [1, angle]]))));
+  ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [0, angle]]))));
   ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [myPlayer.weapon, true]]))));
 
 }
@@ -276,7 +278,10 @@ const spikePlacer = repeater(spikeKey, () => {
 const millPlacer = repeater(millKey, () => {
   cplace(millType);
 }, 65);
-const placers = [boostPlacer, millPlacer, spikePlacer];
+const turretPlacer = repeater(turretKey, () => {
+  cplace(turretType);
+}, 65);
+const placers = [boostPlacer, millPlacer, spikePlacer, turretPlacer];
 document.addEventListener('keydown', event => {
     if (["allianceinput", 'chatbox', "nameinput", "storeHolder"].includes(document.activeElement.id.toLowerCase())) {
         return null;
@@ -338,7 +343,7 @@ document.addEventListener('keydown', event => {
                 ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 6, 0]]))));
                 ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [myPlayer.weapon, true]]))));
             }, 70);
-        }, 90);
+        }, 120);
     }
     if (event.keyCode == 80 && document.activeElement.id.toLowerCase() !== "chatbox") {
         if(heal == false){
@@ -414,6 +419,11 @@ function update() {
     }
     for (let i = 33; i < 36; i++) {
         if (document.getElementById('actionBarItem' + i.toString()).offsetParent !== null) {
+            turretType = i - 16;
+        }
+    }
+    for (let i=37;i<39;i++){
+        if (document.getElementById("actionBarItem" + i.toString()).offsetParent !== null) {
             turretType = i - 16;
         }
     }
