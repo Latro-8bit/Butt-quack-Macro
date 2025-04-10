@@ -106,10 +106,10 @@ style.innerHTML = `
         font-size: 18px;
         text-transform: uppercase;
           text-shadow:
-    -0.7px -0.7px 0 #000,
-    0.7px -0.7px 0 #000,
-    -0.7px 0.7px 0 #000,
-    0.7px 0.7px 0 #000;
+    -0.8px -0.8px 0 #000,
+    0.8px -0.8px 0 #000,
+    -0.8px 0.8px 0 #000,
+    0.8px 0.8px 0 #000;
 
 
     }
