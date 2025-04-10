@@ -305,7 +305,16 @@ document.addEventListener('keydown', event => {
     }
     if ((event.key.toLowerCase() === turretKey) && document.activeElement.id.toLowerCase() !== "chatbox") {
         //press h
-        place(turretType);
+        if(placerOn == false){
+            place(turretType);
+        }
+
+    }
+    if ((event.key.toLowerCase() === millKey) && document.activeElement.id.toLowerCase() !== "chatbox") {
+        //press h
+        if(placerOn == false){
+            place(millType);
+        }
 
     }
     if (event.keyCode == 76 && document.activeElement.id.toLowerCase() !== "chatbox") {
