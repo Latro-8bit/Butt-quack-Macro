@@ -62,11 +62,11 @@ menu.innerHTML = `<div class="MacroMenu-container">
 
         </div>
         <div class="MacroMenu-input">
-            <label style="color: white;">Healer: </label>
+            <label style="color: white;">[P] Healer: </label>
             <span id="healer" style= "color: #cc5151;">FALSE</span>
         </div>
         <div class="MacroMenu-input">
-            <label style="color: white;">Placer: </label>
+            <label style="color: white;">[L] Placer: </label>
             <span id="placer" style="color: #cc5151;">FALSE</span>
         </div>
 </div>`;
