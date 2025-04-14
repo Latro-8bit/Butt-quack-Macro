@@ -2,8 +2,8 @@
 
 - **Controls:**
 - [SHIFT] soldier hat
-- [R] hold spike
+- [V] hold spike
 - [F] hold trap
 - [G] unequip
-- [V] Bull helmet
+- [R] Bull helmet
 - Hold [RMB] for secondary selection
