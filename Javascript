@@ -7,11 +7,11 @@
 // @icon         https://i.imgur.com/LdtQYdJ_d.webp?maxwidth=760&fidelity=grand
 // @match        *://*.moomoo.io/*
 // @require      https://cdn.jsdelivr.net/npm/msgpack-lite@0.1.26/dist/msgpack.min.js
-
 // @grant        none
 // ==/UserScript==
 
 //keybinds
+var clickHammer = false;
 var spikeKey = "v";
 var boostKey = "f";
 var turretKey = "h"; //doents rrly work
@@ -66,13 +66,18 @@ menu.innerHTML = `<div class="MacroMenu-container">
             <input type="text" id="soldierInput" maxlength="1" pattern="[A-Za-z]" oninput="this.value = this.value.replace(/[^A-Za-z]/g, '')"  value="${soldierKey}">
 
         </div>
-        <div class="MacroMenu-input">
-            <label style="color: white;">[P] Healer: </label>
-            <span id="healer" style= "color: #cc5151;">FALSE</span>
+                <div class="MacroMenu-input">
+            <label style="color: white;" for="clickHammerInput">RMB hammer:</label>
+            <span id="clickHammerInput" style= "color: #cc5151; cursor: pointer">FALSE</span>
+
         </div>
         <div class="MacroMenu-input">
-            <label style="color: white;">[L] Placer: </label>
-            <span id="placer" style="color: #cc5151;">FALSE</span>
+            <label style="color: white;">Healer: </label>
+            <span id="healer" style= "color: #cc5151; cursor: pointer">FALSE</span>
+        </div>
+        <div class="MacroMenu-input">
+            <label style="color: white;">Placer: </label>
+            <span id="placer" style="color: #cc5151; cursor: pointer">FALSE</span>
         </div>
         <h1 style="font-size: 24px; color: white; margin-bottom: 8px;">Hat Macro</h1>
         <hr style="border-color: white; margin: 5px 0;">
@@ -140,9 +145,20 @@ height: 10px;
         width: 10px;
         height: 10px;
     }`;
-
 document.head.appendChild(style);
 document.body.appendChild(menu);
+document.getElementById('placer').addEventListener('click', () => {
+    placerOn = !placerOn;
+    change('placer', placerOn);
+});
+document.getElementById('healer').addEventListener('click', () => {
+    heal = !heal;
+    change('healer', heal);
+});
+document.getElementById('clickHammerInput').addEventListener('click', () => {
+    clickHammer = !clickHammer;
+    change('clickHammerInput', clickHammer);
+});
 menu.addEventListener("input", updateKeys);
 function updateKeys() {
     spikeKey = document.getElementById("spikeInput").value;
@@ -214,8 +230,12 @@ function handleMessage(_0x1e1182) {
     }
     if (heal == 1){
         if (item == 'O'&& data[2] < 100 && data[2] > 0 && data[1] == myPlayer.id) {
-            healTimeout = (data[2] + window.pingTime + 25);
-            slowHeal(healTimeout);
+            if (data[2] < 20 && data[2] > 0 && data[1] == myPlayer.id) {
+                doMaxHeal();
+            }else{
+                healTimeout = (data[2] + window.pingTime + 25);
+                slowHeal(healTimeout);
+            }
         }
     }
     if (item == "a") {
@@ -242,9 +262,8 @@ function handleMessage(_0x1e1182) {
 }
 function place(item) {
   //doNewSend(['z', [_0x34ad4e, null]]);
-  ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [item, null]]))));
-  //doNewSend(['z', [null, true]]);
-  //ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [null, true]]))));
+    ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [item, null]]))));
+    //ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [1]]))));
 }
 function cplace(item, angle = null) {
   ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [item, null]]))));
@@ -311,13 +330,17 @@ document.addEventListener('keydown', event => {
     }
         if ((event.key.toLowerCase() === spikeKey) && document.activeElement.id.toLowerCase() !== "chatbox") {
         // press R
+
             if(placerOn == false){
+                if(event.repeat) return
                 place(spikeType);
             }
     }
     if ((event.key.toLowerCase() === boostKey) && document.activeElement.id.toLowerCase() !== "chatbox") {
         //press f
+
         if(placerOn == false){
+            if(event.repeat) return
             place(boostType);
         }
 
@@ -325,6 +348,7 @@ document.addEventListener('keydown', event => {
     if ((event.key.toLowerCase() === turretKey) && document.activeElement.id.toLowerCase() !== "chatbox") {
         //press h
         if(placerOn == false){
+            if(event.repeat) return
             place(turretType);
         }
 
@@ -332,21 +356,10 @@ document.addEventListener('keydown', event => {
     if ((event.key.toLowerCase() === millKey) && document.activeElement.id.toLowerCase() !== "chatbox") {
         //press h
         if(placerOn == false){
+            if(event.repeat) return
             place(millType);
         }
 
-    }
-    if (event.keyCode == 76 && document.activeElement.id.toLowerCase() !== "chatbox") {
-        if(placerOn == false){
-            placerOn = true
-        } else{placerOn = false}
-        change('placer', placerOn);
-    }
-    if (event.keyCode == 80 && document.activeElement.id.toLowerCase() !== "chatbox") {
-        if(heal == false){
-            heal = true
-        } else{heal = false}
-        change('healer', heal);
     }
     if (event.keyCode == 90 && document.activeElement.id.toLowerCase() !== "chatbox") {
         ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 0, 0]]))));//press Z for NOTHING
@@ -387,15 +400,19 @@ document.addEventListener('keyup', event => {
 let oldWeapon = myPlayer.weapon;
 document.addEventListener("mousedown", event => {
     oldWeapon = myPlayer.weapon;
-    if(event.button == 2 && document.activeElement.id.toLowerCase() !== 'chatbox' && secondary == 10){
-        ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [secondary, true]]))));
-        ws.send(new Uint8Array(Array.from(msgpack.encode(['K', [1, 1]]))));
+    if(clickHammer == true){
+        if(event.button == 2 && document.activeElement.id.toLowerCase() !== 'chatbox' && secondary == 10){
+            ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [secondary, true]]))));
+            ws.send(new Uint8Array(Array.from(msgpack.encode(['K', [1, 1]]))));
+        }
     }
 });
 document.addEventListener("mouseup", event => {
-    if(event.button == 2 && document.activeElement.id.toLowerCase() !== 'chatbox' && secondary == 10){
-        ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [oldWeapon, true]]))));
-        ws.send(new Uint8Array(Array.from(msgpack.encode(['K', [1, 1]]))));
+    if(clickHammer == true){
+        if(event.button == 2 && document.activeElement.id.toLowerCase() !== 'chatbox' && secondary == 10){
+            ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [oldWeapon, true]]))));
+            ws.send(new Uint8Array(Array.from(msgpack.encode(['K', [1, 1]]))));
+        }
     }
 });
 document.addEventListener("wheel", event => {
