@@ -1,9 +1,10 @@
 ## MooMoo.io macro
 
 - **Controls:**
-- [SHIFT] soldier hat
+- [SHIFT] Tank
 - [V] hold spike
 - [F] hold trap
-- [G] unequip
+- [G] Turret
+- [Z] Uequip
 - [R] Bull helmet
 - Hold [RMB] for secondary selection
