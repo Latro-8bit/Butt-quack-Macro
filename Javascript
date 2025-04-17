@@ -14,13 +14,13 @@
 // ==/UserScript==
 
 //binds
-const reloadBars = true; // does not show daggers bcs its too fast
+const reloadBars = false; // does not show daggers bcs its too fast
 var clickHammer = false;
-var spikeKey = "v";
+var spikeKey = "r";
 var boostKey = "f";
-var turretKey = "h"; //doents rrly work
+var turretKey = "h";
 var millKey = "n";
-var soldierKey = "r"
+var soldierKey = "v"
 
 //variables
 var ws;
@@ -230,7 +230,7 @@ function handleMessage(_0x1e1182) {
     }
     if (heal == 1){
         if (item == 'O'&& data[2] < 100 && data[2] > 0 && data[1] == myPlayer.id) {
-            if (data[2] < 20 && data[2] > 0 && data[1] == myPlayer.id) {
+            if (data[2] < 25 && data[2] > 0 && data[1] == myPlayer.id) {
                 doMaxHeal();
             }else{
                 healTimeout = (data[2] + window.pingTime + 25);
@@ -399,6 +399,9 @@ document.addEventListener('keyup', event => {
 });
 let oldWeapon = myPlayer.weapon;
 document.addEventListener("mousedown", event => {
+    if (["allianceinput", "chatbox", "nameinput", "storeHolder"].includes(document.activeElement.id.toLowerCase())) {
+        return null;
+    }
     oldWeapon = myPlayer.weapon;
     if(clickHammer == true){
         if(event.button == 2 && document.activeElement.id.toLowerCase() !== 'chatbox' && secondary == 10){
@@ -408,6 +411,9 @@ document.addEventListener("mousedown", event => {
     }
 });
 document.addEventListener("mouseup", event => {
+    if (["allianceinput", "chatbox", "nameinput", "storeHolder"].includes(document.activeElement.id.toLowerCase())) {
+        return null;
+    }
     if(clickHammer == true){
         if(event.button == 2 && document.activeElement.id.toLowerCase() !== 'chatbox' && secondary == 10){
             ws.send(new Uint8Array(Array.from(msgpack.encode(['z', [oldWeapon, true]]))));
@@ -417,7 +423,7 @@ document.addEventListener("mouseup", event => {
 });
 document.addEventListener("wheel", event => {
     //ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [1, null]]))));
-   // ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [0, null]]))));
+    //ws.send(new Uint8Array(Array.from(msgpack.encode(['F', [0, null]]))));
 
 });
 function update() {
@@ -465,7 +471,7 @@ function update() {
 }
 
 
-if(reloadBars == true){
+
     // Functionality from MooMoo.io Visuals
     let width;
     let height;
@@ -475,11 +481,11 @@ if(reloadBars == true){
     window.Cow.addRender("global", () => {
         window.Cow.playersManager.eachVisible(player => {
             if (player === null || player === undefined || !player.alive) return;
-
+            const context = window.Cow.renderer.context;
+            const healthBarPad = window.config.healthBarPad;
+            const conf = window.config;
             function renderBar({ width, innerWidth, xOffset, yOffset, color }) {
-                const context = window.Cow.renderer.context;
-                const healthBarPad = window.config.healthBarPad;
-                const height = 17;
+                const height = 16;
                 const radius = 8;
                 context.save();
                 context.fillStyle = "#3d3f42";
@@ -496,24 +502,43 @@ if(reloadBars == true){
                 context.fill();
                 context.restore();
             }
-            const width = window.config.healthBarWidth / 2 - window.config.healthBarPad / 2;
+            function renderText({xOffset, yOffset, text, fontSize}) {
+                context.textAlign = "center";
+                context.fillStyle = "#fff";
+                context.lineJoin = "round";
+                context.font = fontSize +"px Hammersmith One";
+                context.strokeStyle = "black";
+                context.lineWidth = 6;
+                context.strokeText(text, xOffset, yOffset);
+                context.fillText(text, xOffset, yOffset);
+            }
+
+            const width = conf.healthBarWidth / 2 - conf.healthBarPad / 2;
             const primaryReloadCount = Math.min(Math.max(player.reloads.primary.count / player.reloads.primary.max, 0), 1);
             const secondaryReloadCount = Math.min(Math.max(player.reloads.secondary.count / player.reloads.secondary.max, 0), 1);
-            const yOffset = player.renderY + player.scale + window.config.nameY - 5;
-            renderBar({
-                width,
-                innerWidth: width * primaryReloadCount,
-                xOffset: player.renderX - width * 1.19,
-                yOffset,
-                color: player.isAlly ? "#a5974c" : "#cc5151"
+            const yOffset = player.renderY + player.scale + conf.nameY - 5;
+            if(reloadBars == true){
+                renderBar({
+                    width,
+                    innerWidth: width * primaryReloadCount,
+                    xOffset: player.renderX - width * 1.19,
+                    yOffset,
+                    color: player.isAlly ? "#a5974c" : "#a5974c"
+                });
+                renderBar({
+                    width,
+                    innerWidth: width * secondaryReloadCount,
+                    xOffset: player.renderX + width * 1.19,
+                    yOffset,
+                    color: player.isAlly ? "#a5974c" : "#a5974c"
+                });
+            }
+            renderText({
+                xOffset: player.renderX,
+                yOffset: player.renderY + player.scale + conf.nameY + 35,
+                text: "["+(primaryReloadCount==1?1:0)+","+(secondaryReloadCount==1?1:0)+","+(player.shameCount==8?player.shameTimer:player.shameCount)+"]",
+                fontSize: 20
             });
-            renderBar({
-                width,
-                innerWidth: width * secondaryReloadCount,
-                xOffset: player.renderX + width * 1.19,
-                yOffset,
-                color: player.isAlly ? "#a5974c" : "#cc5151"
-            });
+
         });
     });
-}
