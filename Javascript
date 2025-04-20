@@ -11,18 +11,10 @@
 
 // @grant        none
 // ==/UserScript==
-// ==UserScript==
-// @name         COwJs
-// @namespace    http://tampermonkey.net/
-// @version      2025-04-19
-// @description  try to take over the world!
-// @author       You
-// @match        https://moomoo.io/
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=sploop.io
-// @grant        none
-// ==/UserScript==
 
-//PACKSTART = this is just the cow.js pack modified. actual link -> https://update.greasyfork.org/scripts/480301/1322984/CowJS.js
+
+//PACKSTART = this is just the cow.js pack modified for the visuals to work... actual link -> https://update.greasyfork.org/scripts/480301/1322984/CowJS.js
+//if you dont want them you can remove it from the "//PACKSTART" to the "//PACKend" and make sure the remove the "MooMoo.io visuals start" to "MooMoo.io visual End" at about line ~4400
 
 /******/
 (function() { // webpackBootstrap
@@ -4374,7 +4366,7 @@ function update() {
 
 
 
-// Functionality from MooMoo.io Visuals
+//MooMoo.io Visuals start
 let width;
 let height;
 // Functionality from MooMoo.io Reload Bars
@@ -4445,3 +4437,4 @@ window.Cow.addRender("global", () => {
 
     });
 });
+//MooMoo.io Visuals End
