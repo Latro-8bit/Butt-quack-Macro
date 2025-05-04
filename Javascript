@@ -5,13 +5,11 @@
 // @description  macros for spikes(r), trap(f), soldier(shift), tank(z), .
 // @author       latro
 // @icon         https://i.imgur.com/LdtQYdJ_d.webp?maxwidth=760&fidelity=grand
+// @match        *://moomoo.io/*
 // @match        *://*.moomoo.io/*
-// @match        *://sandbox.moomoo.io/*
 // @require      https://cdn.jsdelivr.net/npm/msgpack-lite@0.1.26/dist/msgpack.min.js
-
 // @grant        none
 // ==/UserScript==
-
 
 //PACKSTART = this is just the cow.js pack modified for the visuals to work... actual link -> https://update.greasyfork.org/scripts/480301/1322984/CowJS.js
 //if you dont want them you can remove it from the "//PACKSTART" to the "//PACKend" and make sure the remove the "MooMoo.io visuals start" to "MooMoo.io visual End" at about line ~4400
@@ -40,10 +38,10 @@
                 var _modules_plugins_index_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__( /*! ./modules/plugins/index.js */ "./src/modules/plugins/index.js");
                 /* harmony import */
                 var _game_configs_index_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__( /*! ./game_configs/index.js */ "./src/game_configs/index.js");
-                class Cow {
-                    constructor() {
-                        this.config = _config_json__WEBPACK_IMPORTED_MODULE_0__
-                        this.items = _game_configs_index_js__WEBPACK_IMPORTED_MODULE_4__
+                    class Cow {
+                        constructor() {
+                            this.config = _config_json__WEBPACK_IMPORTED_MODULE_0__
+                            this.items = _game_configs_index_js__WEBPACK_IMPORTED_MODULE_4__
                         this.codec = _constants_js__WEBPACK_IMPORTED_MODULE_1__.codec
                         this.socket = _constants_js__WEBPACK_IMPORTED_MODULE_1__.socket
                         this.playersManager = _constants_js__WEBPACK_IMPORTED_MODULE_1__.playersManager
@@ -2033,8 +2031,8 @@ callback instanceof Function && callback()
                             this.name = data.name
                             this.isItem = Boolean(this.id !== undefined)
                             this.group = data.group
-                            this.health = data.health
-                            this.maxHealth = 100
+                            this.maxHealth = data.health
+                            this.health = this.maxHealth
                             this.oldHealth = this.maxHealth
                             this.layer = this.group !== undefined ? this.group.layer : this.type === 0 ? 3 : this.type === 2 ? 0 : this.type === 4 ? -1 : 2
                             this.sentTo = {}
@@ -2074,6 +2072,9 @@ callback instanceof Function && callback()
                     get renderY() {
                         return this.y + Number(this.yWiggle) - _constants__WEBPACK_IMPORTED_MODULE_0__.cow.camera.yOffset
                     }
+                    isTeamObject(tmpObj) {
+                        return this.owner == null ? true : (this.owner && tmpObj.sid == this.owner.sid || tmpObj.isAlly(this.owner.sid));
+                    };
                     setVisible(_visible) {
                         if (typeof _visible !== 'boolean') return
                         this.visible = _visible
@@ -2111,6 +2112,9 @@ callback instanceof Function && callback()
                             this.dir += this.turnSpeed * renderer.delta
                         }
                     }
+                    isTeamObject(tmpObj) {
+                        return this.owner == null ? true : (this.owner && tmpObj.sid == this.owner.sid || tmpObj.findAllianceBySid(this.owner.sid));
+                    };
                 }
                 /* harmony default export */
                 __webpack_exports__["default"] = (GameObject);
@@ -2189,6 +2193,9 @@ callback instanceof Function && callback()
                     get isAlly() {
                         return Boolean((this.sid === _constants_js__WEBPACK_IMPORTED_MODULE_0__.cow.player?.sid) || (this.team && this.team === _constants_js__WEBPACK_IMPORTED_MODULE_0__.cow.player.team))
                     }
+                    get mySid(){
+                        return _constants_js__WEBPACK_IMPORTED_MODULE_0__.cow.player?.sid
+                    }
                     get weapon() {
                         return _constants_js__WEBPACK_IMPORTED_MODULE_0__.cow.items.weapons[this.weaponIndex]
                     }
@@ -2200,6 +2207,9 @@ callback instanceof Function && callback()
                     }
                     get tail() {
                         return _constants_js__WEBPACK_IMPORTED_MODULE_0__.cow.items.accessories.searchById(this.tailIndex)
+                    }
+                    isAlliance(obj, tmpObj) {
+                        return Boolean((obj.owner.sid === _constants_js__WEBPACK_IMPORTED_MODULE_0__.cow.player?.sid) || (tmpObj.team && tmpObj.team === _constants_js__WEBPACK_IMPORTED_MODULE_0__.cow.player.team))
                     }
                     _updateCreatedInstance() {
                         this.createdInstance = {}
@@ -2271,6 +2281,7 @@ callback instanceof Function && callback()
                         this.visible = true
                         this.tick()
                     }
+
                     updateShame() {
                         if (this.hitTime) {
                             let timeSinceHit = _constants_js__WEBPACK_IMPORTED_MODULE_0__.cow.ticker.ticks - this.hitTime
@@ -2292,6 +2303,7 @@ callback instanceof Function && callback()
                             }
                         }, 1000);
                     }
+
                     changeHealth(_health) {
                         if (this.skinIndex == 45 && this.shameTimer <= 0) {
                             this.addShameTimer();
@@ -2362,9 +2374,9 @@ callback instanceof Function && callback()
                         } else {
                             if (this.shameCount != 8) {
                                 this.shameCount = 8
-                                this.shameTimer = 270
+                                this.shameTimer = 27
                             }
-                            if (this.shameTimer > 0) this.shameTimer -= 1
+                            if (this.shameTimer > 0) this.shameTimer -= 0.1
                         }
                     }
                     canSee(other) {
@@ -2580,6 +2592,8 @@ callback instanceof Function && callback()
                     }
                     onMousemove(event) {
                         this.setTo(event.clientX, event.clientY)
+                        mouseY = event.clientY;
+                        mouseX = event.clientX;
                     }
                     onMousedown() {
                         this.setState(true)
@@ -2748,14 +2762,14 @@ this.animalsInStream += 1
                             y
                         }
                         let isCanPlace = true
-let building = null
+                        let building = null
 
                         this.eachVisible((gameObject) => {
                             if (!isCanPlace) return
                             const blockScale = (gameObject.blocker ? gameObject.blocker : (gameObject.isItem ? gameObject.scale : gameObject.getScale(scaleMult, gameObject.isItem)))
                             if (CowUtils.getDistance(position, gameObject) < (scale + blockScale)) {
                                 isCanPlace = false
-building = gameObject
+                                building = gameObject
                             }
                         })
                         if (
@@ -3922,6 +3936,7 @@ function clicktheverify() {
 }
 
 //variables
+var visual = true;
 var shame = 0;
 var ws;
 var boostType;
@@ -3987,6 +4002,10 @@ menu.innerHTML = `<div class="MacroMenu-container">
         <div class="MacroMenu-input">
             <label style="color: white;">Placer: </label>
             <span id="placer" style="color: #cc5151; cursor: pointer">FALSE</span>
+        </div>
+                <div class="MacroMenu-input">
+            <label style="color: white;">Visuals: </label>
+            <span id="visuals" style="color: #8ecc51; cursor: pointer">TRUE</span>
         </div>
 
 </div>`;
@@ -4055,6 +4074,10 @@ document.getElementById('healer').addEventListener('click', () => {
     heal = !heal;
     change('healer', heal);
 });
+document.getElementById('visuals').addEventListener('click', () => {
+    visual = !visual;
+    change('visuals', visual);
+});
 document.getElementById('clickHammerInput').addEventListener('click', () => {
     clickHammer = !clickHammer;
     change('clickHammerInput', clickHammer);
@@ -4078,14 +4101,15 @@ function change(id, tog){
     }
 }
 setInterval(clicktheverify, 1000);
-document.msgpack = msgpack;
+var msgpack = window.msgpack;
+document.msgpack = window.msgpack;
 
 WebSocket.prototype.oldSend = WebSocket.prototype.send;
 WebSocket.prototype.send = function (m) {
   if (!ws) {
     document.ws = this;
     ws = this;
-    socketFound(this);
+      socketFound(this);
   }
   this.oldSend(m);
 };
@@ -4093,6 +4117,11 @@ function socketFound(socket) {
   socket.addEventListener("message", function (_0x1ff389) {
     handleMessage(_0x1ff389);
   });
+}
+
+function sendPacket(packetName) {
+    let content = Array.prototype.slice.call(arguments, 1);
+    ws.send(msgpack.encode([packetName, content]));
 }
 function handleMessage(_0x1e1182) {
     let temp = msgpack.decode(new Uint8Array(_0x1e1182.data));
@@ -4130,6 +4159,7 @@ function handleMessage(_0x1e1182) {
                 healTimeout = (data[2] + window.pingTime + 25);
                 slowHeal(healTimeout);
             }
+
         }
     }
     if (item == "a") {
@@ -4198,13 +4228,13 @@ var repeater = function (_0x33a0aa, _0x5c57c6, _0x57f727, _0x11bcc3) {
 
 const boostPlacer = repeater(boostKey, () => {
   cplace(boostType);
-}, 65);
+}, 55);
 const spikePlacer = repeater(spikeKey, () => {
   cplace(spikeType);
-}, 65);
+}, 55);
 const millPlacer = repeater(millKey, () => {
   cplace(millType);
-}, 65);
+}, 55);
 const turretPlacer = repeater(turretKey, () => {
   cplace(turretType);
 }, 65);
@@ -4222,13 +4252,13 @@ document.addEventListener('keydown', event => {
             _0x3101a9.start(event.key.toLowerCase());
         });
     }
-        if ((event.key.toLowerCase() === spikeKey) && document.activeElement.id.toLowerCase() !== "chatbox") {
+    if ((event.key.toLowerCase() === spikeKey) && document.activeElement.id.toLowerCase() !== "chatbox") {
         // press R
 
-            if(placerOn == false){
-                if(event.repeat) return
-                place(spikeType);
-            }
+        if(placerOn == false){
+            if(event.repeat) return
+            place(spikeType);
+        }
     }
     if ((event.key.toLowerCase() === boostKey) && document.activeElement.id.toLowerCase() !== "chatbox") {
         //press f
@@ -4280,6 +4310,9 @@ document.addEventListener('keydown', event => {
              ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 0, 1]]))));
         }
 
+    }
+    if (event.keyCode == 75 && document.activeElement.id.toLowerCase() !== "chatbox") {
+        ws.send(new Uint8Array(Array.from(msgpack.encode(['c', [0, 31, 0]]))));//press K for flipper
     }
 
 });
@@ -4367,23 +4400,40 @@ function update() {
 
 
 //MooMoo.io Visuals start
+let mouseX;
+let mouseY;
 let width;
 let height;
+let lastDir;
+let screenWidth = window.innerWidth;
+let screenHeight = window.innerHeight;
 // Functionality from MooMoo.io Reload Bars
 window.Cow.setCodec(window.msgpack);
 CanvasRenderingContext2D.prototype._roundRect = CanvasRenderingContext2D.prototype.roundRect;
 window.Cow.addRender("global", () => {
     window.Cow.playersManager.eachVisible(player => {
         if (player === null || player === undefined || !player.alive) return;
-
+        function getSafeDir() {
+            if (!player){
+                return 0;
+            }
+            if (player) {
+                lastDir = Math.atan2(mouseY - (screenHeight / 2), mouseX - (screenWidth / 2));
+            }
+            return lastDir || 0;
+        }
         const context = window.Cow.renderer.context;
         const conf = window.config;
-        function renderText({xOffset, yOffset, text, fontSize}) {
+        getSafeDir();
+            // CUSTOMIZATION:
+
+        function renderText({xOffset, yOffset, text, fontSize, color}) {
             context.textAlign = "center";
             context.fillStyle = "#fff";
             context.lineJoin = "round";
             context.font = fontSize +"px Hammersmith One";
             context.strokeStyle = "black";
+            context.fillStyle = color;
             context.lineWidth = 6;
             context.strokeText(text, xOffset, yOffset);
             context.fillText(text, xOffset, yOffset);
@@ -4406,16 +4456,25 @@ window.Cow.addRender("global", () => {
             context.fill();
             context.restore();
         }
-
+        function getMark({color, xOffset, yOffset, obj}) {
+            context.fillStyle = color;
+            context.beginPath();
+            context.arc(xOffset, yOffset, (obj.scale * 0.6)/2, 0, Math.PI * 2); // Adjust the circle size
+            context.fill();
+            context.closePath();
+            context.globalAlpha = 1;
+        }
         const width = conf.healthBarWidth / 2 - conf.healthBarPad / 2;
         const primaryReloadCount = Math.min(Math.max(player.reloads.primary.count / player.reloads.primary.max, 0), 1);
         const secondaryReloadCount = Math.min(Math.max(player.reloads.secondary.count / player.reloads.secondary.max, 0), 1);
+        const turretReloadCount = Math.min(Math.max(player.reloads.turret.count / player.reloads.turret.max, 0), 1);
         const yOffset = player.renderY + player.scale + conf.nameY - 5;
         renderText({
             xOffset: player.renderX,
             yOffset: player.renderY + player.scale + conf.nameY + 35,
-            text: "["+(primaryReloadCount==1?1:0)+","+(secondaryReloadCount==1?1:0)+","+(player.shameCount==8?player.shameTimer:player.shameCount)+"]",
-            fontSize: 20
+            text: "["+(primaryReloadCount==1?1:0)+","+(secondaryReloadCount==1?1:0)+","+(player.shameCount==8?(Math.round(player.shameTimer * 10) / 10).toFixed(1):player.shameCount)+"]",
+            fontSize: 20,
+            color: "#ffffff"
         });
         if(reloadBars == true){
             renderBar({
@@ -4434,7 +4493,37 @@ window.Cow.addRender("global", () => {
             });
         }
 
+        window.Cow.objectsManager.eachVisible(obj => {
+            if(visual){
+                if(obj.health < obj.maxHealth){
+                    renderText({
+                        xOffset: obj.renderX,
+                        yOffset: obj.renderY,
+                        text: obj.health,
+                        fontSize:15,
+                        color: "#ffffffcc"
+                    });
+                }
+                if(obj.name == "spikes" || obj.name == "greater spikes" || obj.name == "poison spikes" || obj.name == "spinning spikes") {
+                    getMark({
+                        xOffset: obj.renderX,
+                        yOffset: obj.renderY,
+                        obj: obj,
+                        color: player.isAlliance(obj, player)?"#353566cc":"#810c2750"
+                    });
 
+                } else if(obj.name == "pit trap") {
+                    getMark({
+                        xOffset: obj.renderX,
+                        yOffset: obj.renderY,
+                        obj: obj,
+                        color: player.isAlliance(obj, player)?"#353566cc":"#810c2750"
+                    });
+                }
+            }
+        });
     });
+
 });
+
 //MooMoo.io Visuals End
