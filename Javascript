@@ -4531,9 +4531,12 @@ window.Cow.addRender("global", () => {
         const turretReloadCount = Math.min(Math.max(player.reloads.turret.count / player.reloads.turret.max, 0), 1);
         const yOffset = player.renderY + player.scale + conf.nameY - 5;
 //asdf
+
+
+        if(reloadBars == true){
         const centerX = player.renderX;
         const centerY = player.renderY;
-        const barRadius = 28;
+        const barRadius = 35;
         const barWidth = 15;
         const totalAngle = (Math.PI*2)/3; // Half circle
         const secondaryStartAngle = -Math.PI / 2 + Math.PI / 3;
@@ -4592,22 +4595,6 @@ window.Cow.addRender("global", () => {
             context.stroke();
         }
         context.restore();
-
-        if(reloadBars == true){
-            renderBar({
-                width,
-                innerWidth: width * primaryReloadCount,
-                xOffset: player.renderX - width * 1.19,
-                yOffset,
-                color: player.isAlly ? "#a5974c" : "#a5974c"
-            });
-            renderBar({
-                width,
-                innerWidth: width * secondaryReloadCount,
-                xOffset: player.renderX + width * 1.19,
-                yOffset,
-                color: player.isAlly ? "#a5974c" : "#a5974c"
-            });
         }
 
         window.Cow.objectsManager.eachVisible(obj => {
