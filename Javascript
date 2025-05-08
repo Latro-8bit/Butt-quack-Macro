@@ -4462,7 +4462,6 @@ window.Cow.addRender("global", () => {
                               ((conf.healthBarWidth * 2) * (player.health / player.maxHealth)), 17 - conf.healthBarPad * 2, 7);
             context.fill();
         }
-        console.log(tmpObj.sid);
         function renderText({xOffset, yOffset, text, fontSize, color}) {
             context.textAlign = "center";
             context.fillStyle = "#fff";
@@ -4532,66 +4531,67 @@ window.Cow.addRender("global", () => {
         const turretReloadCount = Math.min(Math.max(player.reloads.turret.count / player.reloads.turret.max, 0), 1);
         const yOffset = player.renderY + player.scale + conf.nameY - 5;
 //asdf
-        const centerX = tmpObj.renderX;
-        const centerY = tmpObj.renderY;
+        const centerX = player.renderX;
+        const centerY = player.renderY;
         const barRadius = 28;
         const barWidth = 15;
         const totalAngle = (Math.PI*2)/3; // Half circle
         const secondaryStartAngle = -Math.PI / 2 + Math.PI / 3;
-        const secondaryEndAngle = secondaryStartAngle + (totalAngle * tmpObj.reloads.secondary.count);
+        const secondaryEndAngle = secondaryStartAngle + (totalAngle * secondaryReloadCount);
         const primaryStartAngle = Math.PI / 2;
-        const primaryEndAngle = primaryStartAngle + (totalAngle * tmpObj.reloads.primary.count);
+        const primaryEndAngle = primaryStartAngle + (totalAngle * primaryReloadCount);
 
         const turretStartAngle = Math.PI + Math.PI / 4.5;
-        const turretEndAngle = turretStartAngle + (totalAngle/1.25 * tmpObj.reloads.turret.count);
+        const turretEndAngle = turretStartAngle + (totalAngle/1.25 * turretReloadCount);
         function returncoolcolor(RainbowCycle) {
             return `hsl(${RainbowCycle}, 100%, 50%, 30)`;
         }
 
         context.save();
-        if (tmpObj.currentReloads.primary < 0.999) {
+        if (primaryReloadCount < 0.999) {
+            console.log("he");
             context.beginPath();
             //   mainContext.lineCap = 'round';
             context.arc(centerX, centerY, barRadius, primaryStartAngle, primaryEndAngle);
             context.lineWidth = 4;
-            context.strokeStyle = darkOutlineColor;
+            context.strokeStyle = "#3D3F42";
             context.stroke();
             context.beginPath();
             // mainContext.lineCap = 'round';
             context.arc(centerX, centerY, barRadius, primaryStartAngle, primaryEndAngle);
             context.lineWidth = 4;
-            context.strokeStyle = returncoolcolor(tmpObj.currentReloads.primary * 200);
+            context.strokeStyle = returncoolcolor(primaryReloadCount * 200);
             context.stroke();
         }
-        if (tmpObj.currentReloads.secondary < 0.999) {
-            mainContext.beginPath();
+        if (secondaryReloadCount < 0.999) {
+            context.beginPath();
             //  mainContext.lineCap = 'round';
-            mainContext.arc(centerX, centerY, barRadius, secondaryStartAngle, secondaryEndAngle);
-            mainContext.lineWidth = 4;
-            mainContext.strokeStyle = darkOutlineColor;
-            mainContext.stroke();
-            mainContext.beginPath();
+            context.arc(centerX, centerY, barRadius, secondaryStartAngle, secondaryEndAngle);
+            context.lineWidth = 4;
+            context.strokeStyle = "#3D3F42";
+            context.stroke();
+            context.beginPath();
             //    mainContext.lineCap = 'round';
-            mainContext.arc(centerX, centerY, barRadius, secondaryStartAngle, secondaryEndAngle);
-            mainContext.lineWidth = 4;
-            mainContext.strokeStyle = returncoolcolor(tmpObj.currentReloads.secondary * 200);
-            mainContext.stroke();
+            context.arc(centerX, centerY, barRadius, secondaryStartAngle, secondaryEndAngle);
+            context.lineWidth = 4;
+            context.strokeStyle = returncoolcolor(secondaryReloadCount * 200);
+            context.stroke();
         }
-        if (tmpObj.currentReloads.turret < 0.999) {
-            mainContext.beginPath();
+        if (turretReloadCount < 0.999) {
+            context.beginPath();
             //   mainContext.lineCap = 'round';
-            mainContext.arc(centerX, centerY, barRadius, turretStartAngle, turretEndAngle);
-            mainContext.lineWidth = 4;
-            mainContext.strokeStyle = darkOutlineColor;
-            mainContext.stroke();
-            mainContext.beginPath();
+            context.arc(centerX, centerY, barRadius, turretStartAngle, turretEndAngle);
+            context.lineWidth = 4;
+            context.strokeStyle = "#3D3F42";
+            context.stroke();
+            context.beginPath();
             //mainContext.lineCap = 'round';
-            mainContext.arc(centerX, centerY, barRadius, turretStartAngle, turretEndAngle);
-            mainContext.lineWidth = 4;
-            mainContext.strokeStyle = returncoolcolor(tmpObj.currentReloads.turret * 200);
-            mainContext.stroke();
+            context.arc(centerX, centerY, barRadius, turretStartAngle, turretEndAngle);
+            context.lineWidth = 4;
+            context.strokeStyle = returncoolcolor(turretReloadCount * 200);
+            context.stroke();
         }
-        mainContext.restore();
+        context.restore();
 
         if(reloadBars == true){
             renderBar({
