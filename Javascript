@@ -4405,6 +4405,7 @@ let mouseY;
 let width;
 let height;
 let lastDir;
+let tmpObj;
 let screenWidth = window.innerWidth;
 let screenHeight = window.innerHeight;
 // Functionality from MooMoo.io Reload Bars
@@ -4413,6 +4414,10 @@ CanvasRenderingContext2D.prototype._roundRect = CanvasRenderingContext2D.prototy
 window.Cow.addRender("global", () => {
     window.Cow.playersManager.eachVisible(player => {
         if (player === null || player === undefined || !player.alive) return;
+        if (player.sid != player.mySid){
+            tmpObj = player;
+        } else{
+        tmpObj = player}
         function getSafeDir() {
             if (!player){
                 return 0;
@@ -4426,17 +4431,71 @@ window.Cow.addRender("global", () => {
         const conf = window.config;
         getSafeDir();
             // CUSTOMIZATION:
+        function play({xOffset, yOffset}){
 
+            // NAME AND HEALTH:
+            if (player.skinIndex != 10) {
+                let tmpText = (player.team ? "[" + player.team + "] " : "") + (player.name || ""); //+ (tmpObj.isPlayer ? " {" + tmpObj.sid + "}" : "");
+                if (tmpText != "") {
+                    context.font = (player.nameScale || 30) + "px Hammersmith One";
+                    context.fillStyle = "#fff";
+                    context.strokeStyle = "#3D3F42";
+                    context.textBaseline = "middle";
+                    context.textAlign = "center";
+                    context.lineWidth = (player.nameScale ? 11 : 8);
+                    context.lineJoin = "round";
+                    context.strokeText(tmpText, player.renderX, (player.renderY - player.scale) - conf.nameY);
+                    context.fillText(tmpText, player.renderX , (player.renderY - player.scale) - conf.nameY);
+                }
+            }
+            // HEALTH HOLDER:
+            context.fillStyle = "#3d3f42";
+            context.roundRect(player.renderX - conf.healthBarWidth - conf.healthBarPad,
+                              (player.renderY + player.scale) + conf.nameY, (conf.healthBarWidth * 2) +
+                              (conf.healthBarPad * 2), 17, 8);
+            context.fill();
+
+            // HEALTH BAR:
+            context.fillStyle = (player.sid == player.mySid || (player.isAlly)) ? "#8ecc51" : "#cc5151";
+            context.roundRect(player.renderX - conf.healthBarWidth,
+                              (player.renderY + player.scale) + conf.nameY + conf.healthBarPad,
+                              ((conf.healthBarWidth * 2) * (player.health / player.maxHealth)), 17 - conf.healthBarPad * 2, 7);
+            context.fill();
+        }
+        console.log(tmpObj.sid);
         function renderText({xOffset, yOffset, text, fontSize, color}) {
             context.textAlign = "center";
             context.fillStyle = "#fff";
             context.lineJoin = "round";
             context.font = fontSize +"px Hammersmith One";
-            context.strokeStyle = "black";
+            context.strokeStyle = "#3D3F42";
             context.fillStyle = color;
             context.lineWidth = 6;
             context.strokeText(text, xOffset, yOffset);
             context.fillText(text, xOffset, yOffset);
+        }
+        function renderRing({ radius, thickness, progress, xOffset, yOffset, color }) {
+            const startAngle = -Math.PI / 2; // Start at the top (12 o'clock position)
+            const endAngle = startAngle + (2 * Math.PI * progress); // Progress determines how much of the ring is filled
+
+            // Outer background ring (full circle, gray)
+            context.save();
+            context.beginPath();
+            context.arc(xOffset, yOffset, radius, 0, 2 * Math.PI);
+            context.strokeStyle = "#3d3f4200";
+            context.lineWidth = thickness; //7 Slightly thicker for border effect
+            context.stroke();
+            context.restore();
+
+            // Inner colored ring (progress-based)
+            context.save();
+            context.beginPath();
+            context.arc(xOffset, yOffset, radius, startAngle, endAngle);
+            context.strokeStyle = color;
+            context.lineWidth = thickness;
+            context.lineCap = "round"; // Smooth edges
+            context.stroke();
+            context.restore();
         }
         function renderBar({ width, innerWidth, xOffset, yOffset, color}) {
             const height = 17;
@@ -4448,6 +4507,8 @@ window.Cow.addRender("global", () => {
             context._roundRect(-width - conf.healthBarPad, -8.5, 2* width + 2 * conf.healthBarPad, height, radius);
             context.fill();
             context.restore();
+
+
             context.save();
             context.fillStyle = color;
             context.translate(xOffset, yOffset);
@@ -4462,20 +4523,76 @@ window.Cow.addRender("global", () => {
             context.arc(xOffset, yOffset, (obj.scale * 0.6)/2, 0, Math.PI * 2); // Adjust the circle size
             context.fill();
             context.closePath();
-            context.globalAlpha = 1;
         }
+
+
         const width = conf.healthBarWidth / 2 - conf.healthBarPad / 2;
         const primaryReloadCount = Math.min(Math.max(player.reloads.primary.count / player.reloads.primary.max, 0), 1);
         const secondaryReloadCount = Math.min(Math.max(player.reloads.secondary.count / player.reloads.secondary.max, 0), 1);
         const turretReloadCount = Math.min(Math.max(player.reloads.turret.count / player.reloads.turret.max, 0), 1);
         const yOffset = player.renderY + player.scale + conf.nameY - 5;
-        renderText({
-            xOffset: player.renderX,
-            yOffset: player.renderY + player.scale + conf.nameY + 35,
-            text: "["+(primaryReloadCount==1?1:0)+","+(secondaryReloadCount==1?1:0)+","+(player.shameCount==8?(Math.round(player.shameTimer * 10) / 10).toFixed(1):player.shameCount)+"]",
-            fontSize: 20,
-            color: "#ffffff"
-        });
+//asdf
+        const centerX = tmpObj.renderX;
+        const centerY = tmpObj.renderY;
+        const barRadius = 28;
+        const barWidth = 15;
+        const totalAngle = (Math.PI*2)/3; // Half circle
+        const secondaryStartAngle = -Math.PI / 2 + Math.PI / 3;
+        const secondaryEndAngle = secondaryStartAngle + (totalAngle * tmpObj.reloads.secondary.count);
+        const primaryStartAngle = Math.PI / 2;
+        const primaryEndAngle = primaryStartAngle + (totalAngle * tmpObj.reloads.primary.count);
+
+        const turretStartAngle = Math.PI + Math.PI / 4.5;
+        const turretEndAngle = turretStartAngle + (totalAngle/1.25 * tmpObj.reloads.turret.count);
+        function returncoolcolor(RainbowCycle) {
+            return `hsl(${RainbowCycle}, 100%, 50%, 30)`;
+        }
+
+        context.save();
+        if (tmpObj.currentReloads.primary < 0.999) {
+            context.beginPath();
+            //   mainContext.lineCap = 'round';
+            context.arc(centerX, centerY, barRadius, primaryStartAngle, primaryEndAngle);
+            context.lineWidth = 4;
+            context.strokeStyle = darkOutlineColor;
+            context.stroke();
+            context.beginPath();
+            // mainContext.lineCap = 'round';
+            context.arc(centerX, centerY, barRadius, primaryStartAngle, primaryEndAngle);
+            context.lineWidth = 4;
+            context.strokeStyle = returncoolcolor(tmpObj.currentReloads.primary * 200);
+            context.stroke();
+        }
+        if (tmpObj.currentReloads.secondary < 0.999) {
+            mainContext.beginPath();
+            //  mainContext.lineCap = 'round';
+            mainContext.arc(centerX, centerY, barRadius, secondaryStartAngle, secondaryEndAngle);
+            mainContext.lineWidth = 4;
+            mainContext.strokeStyle = darkOutlineColor;
+            mainContext.stroke();
+            mainContext.beginPath();
+            //    mainContext.lineCap = 'round';
+            mainContext.arc(centerX, centerY, barRadius, secondaryStartAngle, secondaryEndAngle);
+            mainContext.lineWidth = 4;
+            mainContext.strokeStyle = returncoolcolor(tmpObj.currentReloads.secondary * 200);
+            mainContext.stroke();
+        }
+        if (tmpObj.currentReloads.turret < 0.999) {
+            mainContext.beginPath();
+            //   mainContext.lineCap = 'round';
+            mainContext.arc(centerX, centerY, barRadius, turretStartAngle, turretEndAngle);
+            mainContext.lineWidth = 4;
+            mainContext.strokeStyle = darkOutlineColor;
+            mainContext.stroke();
+            mainContext.beginPath();
+            //mainContext.lineCap = 'round';
+            mainContext.arc(centerX, centerY, barRadius, turretStartAngle, turretEndAngle);
+            mainContext.lineWidth = 4;
+            mainContext.strokeStyle = returncoolcolor(tmpObj.currentReloads.turret * 200);
+            mainContext.stroke();
+        }
+        mainContext.restore();
+
         if(reloadBars == true){
             renderBar({
                 width,
@@ -4495,7 +4612,32 @@ window.Cow.addRender("global", () => {
 
         window.Cow.objectsManager.eachVisible(obj => {
             if(visual){
+                if(obj.name == "spikes" || obj.name == "greater spikes" || obj.name == "poison spikes" || obj.name == "spinning spikes") {
+                    getMark({
+                        xOffset: obj.renderX,
+                        yOffset: obj.renderY,
+                        obj: obj,
+                        color: player.isAlliance(obj, player)?"#837751":"#633433"
+                    });
+
+                } else if(obj.name == "pit trap") {
+                    getMark({
+                        xOffset: obj.renderX,
+                        yOffset: obj.renderY,
+                        obj: obj,
+                        color: player.isAlliance(obj, player)?"#4f5953":"#633433"
+                    });
+                }
                 if(obj.health < obj.maxHealth){
+
+                    renderRing({
+                        radius: 24,// Size of the ring
+                        thickness:7,// Thickness of the ring
+                        progress: obj.health / obj.maxHealth,// Health percentage (0 to 1)
+                        xOffset: obj.renderX,
+                        yOffset: obj.renderY,
+                        color: player.isAlliance(obj, player) ? "#ffffff" : "#633433"
+                    });
                     renderText({
                         xOffset: obj.renderX,
                         yOffset: obj.renderY,
@@ -4504,23 +4646,19 @@ window.Cow.addRender("global", () => {
                         color: "#ffffffcc"
                     });
                 }
-                if(obj.name == "spikes" || obj.name == "greater spikes" || obj.name == "poison spikes" || obj.name == "spinning spikes") {
-                    getMark({
-                        xOffset: obj.renderX,
-                        yOffset: obj.renderY,
-                        obj: obj,
-                        color: player.isAlliance(obj, player)?"#353566cc":"#810c2750"
-                    });
 
-                } else if(obj.name == "pit trap") {
-                    getMark({
-                        xOffset: obj.renderX,
-                        yOffset: obj.renderY,
-                        obj: obj,
-                        color: player.isAlliance(obj, player)?"#353566cc":"#810c2750"
-                    });
-                }
             }
+        });
+        play({
+            xOffset: player.renderX,
+            yOffset: player.renderY,
+        })
+        renderText({
+            xOffset: player.renderX,
+            yOffset: player.renderY + player.scale + conf.nameY + 35,
+            text: "["+(primaryReloadCount==1?1:0)+","+(secondaryReloadCount==1?1:0)+","+(player.shameCount==8?(Math.round(player.shameTimer * 10) / 10).toFixed(1):player.shameCount)+"]",
+            fontSize: 20,
+            color: "#ffffff"
         });
     });
 
