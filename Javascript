@@ -4648,7 +4648,7 @@ window.Cow.addRender("global", () => {
             renderText({
                 xOffset: player.renderX,
                 yOffset: player.renderY + player.scale + conf.nameY + 35,
-                text: "["+(primaryReloadCount==1?1:0)+","+(secondaryReloadCount==1?1:0)+","+(player.shameCount==8?(Math.round(player.shameTimer * 10) / 10).toFixed(1):player.shameCount)+","+Math.round(lastDir)+"]",
+                text: "["+(primaryReloadCount==1?1:0)+","+(secondaryReloadCount==1?1:0)+","+(player.shameCount==8?(Math.round(player.shameTimer * 10) / 10).toFixed(1):player.shameCount)+"]",
                 fontSize: 20,
                 color: "#ffffff"
             });
