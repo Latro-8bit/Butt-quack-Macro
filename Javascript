@@ -2156,6 +2156,7 @@ callback instanceof Function && callback()
                         this.weapons = [0]
                         this.skins = {}
                         this.tails = {}
+                        this.ticks = 0;
                         const defineFreeCaps = (config, capType) => {
                             for (let i = 0; i < config.length; ++i) {
                                 const cap = config[i]
@@ -2378,6 +2379,7 @@ callback instanceof Function && callback()
                             }
                             if (this.shameTimer > 0) this.shameTimer -= 0.1
                         }
+                        this.ticks = _constants_js__WEBPACK_IMPORTED_MODULE_0__.cow.ticker.ticks;
                     }
                     canSee(other) {
                         if (!other) return false
@@ -4406,62 +4408,33 @@ let width;
 let height;
 let lastDir;
 let tmpObj;
+let lastTick;
 let screenWidth = window.innerWidth;
 let screenHeight = window.innerHeight;
+function getDist(tmpX1, tmpY1, tmpX2, tmpY2){
+    let a = tmpX1 - tmpX2;
+    let b = tmpY1 - tmpY2;
+    let c = Math.sqrt((a*a) + (b*b));
+    return c;
+}
 // Functionality from MooMoo.io Reload Bars
 window.Cow.setCodec(window.msgpack);
 CanvasRenderingContext2D.prototype._roundRect = CanvasRenderingContext2D.prototype.roundRect;
 window.Cow.addRender("global", () => {
     window.Cow.playersManager.eachVisible(player => {
         if (player === null || player === undefined || !player.alive) return;
-        if (player.sid != player.mySid){
+        if(!player.isAlly){
             tmpObj = player;
-        } else{
-        tmpObj = player}
+        }
         function getSafeDir() {
             if (!player){
                 return 0;
             }
-            if (player) {
-                lastDir = Math.atan2(mouseY - (screenHeight / 2), mouseX - (screenWidth / 2));
-            }
-            return lastDir || 0;
         }
         const context = window.Cow.renderer.context;
         const conf = window.config;
         getSafeDir();
             // CUSTOMIZATION:
-        function play({xOffset, yOffset}){
-
-            // NAME AND HEALTH:
-            if (player.skinIndex != 10) {
-                let tmpText = (player.team ? "[" + player.team + "] " : "") + (player.name || ""); //+ (tmpObj.isPlayer ? " {" + tmpObj.sid + "}" : "");
-                if (tmpText != "") {
-                    context.font = (player.nameScale || 30) + "px Hammersmith One";
-                    context.fillStyle = "#fff";
-                    context.strokeStyle = "#3D3F42";
-                    context.textBaseline = "middle";
-                    context.textAlign = "center";
-                    context.lineWidth = (player.nameScale ? 11 : 8);
-                    context.lineJoin = "round";
-                    context.strokeText(tmpText, player.renderX, (player.renderY - player.scale) - conf.nameY);
-                    context.fillText(tmpText, player.renderX , (player.renderY - player.scale) - conf.nameY);
-                }
-            }
-            // HEALTH HOLDER:
-            context.fillStyle = "#3d3f42";
-            context.roundRect(player.renderX - conf.healthBarWidth - conf.healthBarPad,
-                              (player.renderY + player.scale) + conf.nameY, (conf.healthBarWidth * 2) +
-                              (conf.healthBarPad * 2), 17, 8);
-            context.fill();
-
-            // HEALTH BAR:
-            context.fillStyle = (player.sid == player.mySid || (player.isAlly)) ? "#8ecc51" : "#cc5151";
-            context.roundRect(player.renderX - conf.healthBarWidth,
-                              (player.renderY + player.scale) + conf.nameY + conf.healthBarPad,
-                              ((conf.healthBarWidth * 2) * (player.health / player.maxHealth)), 17 - conf.healthBarPad * 2, 7);
-            context.fill();
-        }
         function renderText({xOffset, yOffset, text, fontSize, color}) {
             context.textAlign = "center";
             context.fillStyle = "#fff";
@@ -4522,89 +4495,117 @@ window.Cow.addRender("global", () => {
             context.arc(xOffset, yOffset, (obj.scale * 0.6)/2, 0, Math.PI * 2); // Adjust the circle size
             context.fill();
             context.closePath();
+            context.restore();
         }
 
+        function play({xOffset, yOffset}){
+            // NAME AND HEALTH:
+            if (player.skinIndex != 10) {
+                let tmpText = (player.team ? "[" + player.team + "] " : "") + (player.name || ""); //+ (tmpObj.isPlayer ? " {" + tmpObj.sid + "}" : "");
+                if (tmpText != "") {
+                    context.font = (player.nameScale || 30) + "px Hammersmith One";
+                    context.fillStyle = "#fff";
+                    context.strokeStyle = "#3D3F42";
+                    context.textBaseline = "middle";
+                    context.textAlign = "center";
+                    context.lineWidth = (player.nameScale ? 11 : 8);
+                    context.lineJoin = "round";
+                    context.strokeText(tmpText, player.renderX, (player.renderY - player.scale) - conf.nameY);
+                    context.fillText(tmpText, player.renderX , (player.renderY - player.scale) - conf.nameY);
+                }
+            }
+            // HEALTH HOLDER:
+            context.fillStyle = "#3d3f42";
+            context.roundRect(player.renderX - conf.healthBarWidth - conf.healthBarPad,
+                              (player.renderY + player.scale) + conf.nameY, (conf.healthBarWidth * 2) +
+                              (conf.healthBarPad * 2), 17, 8);
+            context.fill();
 
+            // HEALTH BAR:
+            context.fillStyle = (player.sid == player.mySid || (player.isAlly)) ? "#8ecc51" : "#cc5151";
+            context.roundRect(player.renderX - conf.healthBarWidth,
+                              (player.renderY + player.scale) + conf.nameY + conf.healthBarPad,
+                              ((conf.healthBarWidth * 2) * (player.health / player.maxHealth)), 17 - conf.healthBarPad * 2, 7);
+            context.fill();
+        }
         const width = conf.healthBarWidth / 2 - conf.healthBarPad / 2;
-        const primaryReloadCount = Math.min(Math.max(player.reloads.primary.count / player.reloads.primary.max, 0), 1);
-        const secondaryReloadCount = Math.min(Math.max(player.reloads.secondary.count / player.reloads.secondary.max, 0), 1);
-        const turretReloadCount = Math.min(Math.max(player.reloads.turret.count / player.reloads.turret.max, 0), 1);
+        const primaryReloadCount = player.reloads.primary.count / player.reloads.primary.max;
+        const secondaryReloadCount = player.reloads.secondary.count / player.reloads.secondary.max;
+        const turretReloadCount = player.reloads.turret.count / player.reloads.turret.max;
         const yOffset = player.renderY + player.scale + conf.nameY - 5;
-//asdf
-
-
+        //reloadsing
         if(reloadBars == true){
-        const centerX = player.renderX;
-        const centerY = player.renderY;
-        const barRadius = 35;
-        const barWidth = 15;
-        const totalAngle = (Math.PI*2)/3; // Half circle
-        const secondaryStartAngle = -Math.PI / 2 + Math.PI / 3;
-        const secondaryEndAngle = secondaryStartAngle + (totalAngle * secondaryReloadCount);
-        const primaryStartAngle = Math.PI / 2;
-        const primaryEndAngle = primaryStartAngle + (totalAngle * primaryReloadCount);
+            const centerX = player.renderX;
+            const centerY = player.renderY;
+            const barRadius = 35;
+            const barWidth = 15;
+            const totalAngle = (Math.PI*2)/3; // Half circle
+            const secondaryStartAngle = -Math.PI / 2 + Math.PI / 3;
+            const secondaryEndAngle = secondaryStartAngle + (totalAngle * secondaryReloadCount);
+            const primaryStartAngle = Math.PI / 2;
+            const primaryEndAngle = primaryStartAngle + (totalAngle * primaryReloadCount);
 
-        const turretStartAngle = Math.PI + Math.PI / 4.5;
-        const turretEndAngle = turretStartAngle + (totalAngle/1.25 * turretReloadCount);
-        function returncoolcolor(RainbowCycle) {
-            return `hsl(${RainbowCycle}, 100%, 50%, 30)`;
-        }
+            const turretStartAngle = Math.PI + Math.PI / 4.5;
+            const turretEndAngle = turretStartAngle + (totalAngle/1.25 * turretReloadCount);
+            function returncoolcolor(RainbowCycle) {
+                return `hsl(${RainbowCycle}, 100%, 50%, 30)`;
+            }
 
-        context.save();
-        if (primaryReloadCount < 0.999) {
-            console.log("he");
-            context.beginPath();
-            //   mainContext.lineCap = 'round';
-            context.arc(centerX, centerY, barRadius, primaryStartAngle, primaryEndAngle);
-            context.lineWidth = 4;
-            context.strokeStyle = "#3D3F42";
-            context.stroke();
-            context.beginPath();
-            // mainContext.lineCap = 'round';
-            context.arc(centerX, centerY, barRadius, primaryStartAngle, primaryEndAngle);
-            context.lineWidth = 4;
-            context.strokeStyle = returncoolcolor(primaryReloadCount * 200);
-            context.stroke();
-        }
-        if (secondaryReloadCount < 0.999) {
-            context.beginPath();
-            //  mainContext.lineCap = 'round';
-            context.arc(centerX, centerY, barRadius, secondaryStartAngle, secondaryEndAngle);
-            context.lineWidth = 4;
-            context.strokeStyle = "#3D3F42";
-            context.stroke();
-            context.beginPath();
-            //    mainContext.lineCap = 'round';
-            context.arc(centerX, centerY, barRadius, secondaryStartAngle, secondaryEndAngle);
-            context.lineWidth = 4;
-            context.strokeStyle = returncoolcolor(secondaryReloadCount * 200);
-            context.stroke();
-        }
-        if (turretReloadCount < 0.999) {
-            context.beginPath();
-            //   mainContext.lineCap = 'round';
-            context.arc(centerX, centerY, barRadius, turretStartAngle, turretEndAngle);
-            context.lineWidth = 4;
-            context.strokeStyle = "#3D3F42";
-            context.stroke();
-            context.beginPath();
-            //mainContext.lineCap = 'round';
-            context.arc(centerX, centerY, barRadius, turretStartAngle, turretEndAngle);
-            context.lineWidth = 4;
-            context.strokeStyle = returncoolcolor(turretReloadCount * 200);
-            context.stroke();
-        }
-        context.restore();
+            context.save();
+            if (primaryReloadCount < 0.999) {
+                context.beginPath();
+                //   mainContext.lineCap = 'round';
+                context.arc(centerX, centerY, barRadius, primaryStartAngle, primaryEndAngle);
+                context.lineWidth = 4;
+                context.strokeStyle = "#3D3F42";
+                context.stroke();
+                context.beginPath();
+                // mainContext.lineCap = 'round';
+                context.arc(centerX, centerY, barRadius, primaryStartAngle, primaryEndAngle);
+                context.lineWidth = 4;
+                context.strokeStyle = returncoolcolor(primaryReloadCount * 200);
+                context.stroke();
+            }
+            if (secondaryReloadCount < 0.999) {
+                context.beginPath();
+                //  mainContext.lineCap = 'round';
+                context.arc(centerX, centerY, barRadius, secondaryStartAngle, secondaryEndAngle);
+                context.lineWidth = 4;
+                context.strokeStyle = "#3D3F42";
+                context.stroke();
+                context.beginPath();
+                //    mainContext.lineCap = 'round';
+                context.arc(centerX, centerY, barRadius, secondaryStartAngle, secondaryEndAngle);
+                context.lineWidth = 4;
+                context.strokeStyle = returncoolcolor(secondaryReloadCount * 200);
+                context.stroke();
+            }
+            if (turretReloadCount < 0.999) {
+                context.beginPath();
+                //   mainContext.lineCap = 'round';
+                context.arc(centerX, centerY, barRadius, turretStartAngle, turretEndAngle);
+                context.lineWidth = 4;
+                context.strokeStyle = "#3D3F42";
+                context.stroke();
+                context.beginPath();
+                //mainContext.lineCap = 'round';
+                context.arc(centerX, centerY, barRadius, turretStartAngle, turretEndAngle);
+                context.lineWidth = 4;
+                context.strokeStyle = returncoolcolor(turretReloadCount * 200);
+                context.stroke();
+            }
+            context.restore();
         }
 
         window.Cow.objectsManager.eachVisible(obj => {
             if(visual){
+                lastDir = getDist(obj.renderX, obj.renderY, player.renderX, player.renderY);
                 if(obj.name == "spikes" || obj.name == "greater spikes" || obj.name == "poison spikes" || obj.name == "spinning spikes") {
                     getMark({
                         xOffset: obj.renderX,
                         yOffset: obj.renderY,
                         obj: obj,
-                        color: player.isAlliance(obj, player)?"#837751":"#633433"
+                        color: player.isAlliance(obj, player)?"#83775100":"#633433"
                     });
 
                 } else if(obj.name == "pit trap") {
@@ -4612,41 +4613,47 @@ window.Cow.addRender("global", () => {
                         xOffset: obj.renderX,
                         yOffset: obj.renderY,
                         obj: obj,
-                        color: player.isAlliance(obj, player)?"#4f5953":"#633433"
+                        color: player.isAlliance(obj, player)?"#4f595300":"#633433"
                     });
                 }
-                if(obj.health < obj.maxHealth){
+                if(lastDir < 200 && renderBar == true){
+                    if(obj.health < obj.maxHealth){
 
-                    renderRing({
-                        radius: 24,// Size of the ring
-                        thickness:7,// Thickness of the ring
-                        progress: obj.health / obj.maxHealth,// Health percentage (0 to 1)
-                        xOffset: obj.renderX,
-                        yOffset: obj.renderY,
-                        color: player.isAlliance(obj, player) ? "#ffffff" : "#633433"
-                    });
-                    renderText({
-                        xOffset: obj.renderX,
-                        yOffset: obj.renderY,
-                        text: obj.health,
-                        fontSize:15,
-                        color: "#ffffffcc"
-                    });
+                        renderRing({
+                            radius: 24,// Size of the ring
+                            thickness:7,// Thickness of the ring
+                            progress: obj.health / obj.maxHealth,// Health percentage (0 to 1)
+                            xOffset: obj.renderX,
+                            yOffset: obj.renderY,
+                            color: player.isAlliance(obj, player) ? "#ffffff" : "#633433"
+                        });
+                        renderText({
+                            xOffset: obj.renderX,
+                            yOffset: obj.renderY,
+                            text: obj.health,
+                            fontSize:15,
+                            color: "#ffffffcc"
+                        });
+                    }
+
                 }
-
             }
         });
-        play({
-            xOffset: player.renderX,
-            yOffset: player.renderY,
-        })
-        renderText({
-            xOffset: player.renderX,
-            yOffset: player.renderY + player.scale + conf.nameY + 35,
-            text: "["+(primaryReloadCount==1?1:0)+","+(secondaryReloadCount==1?1:0)+","+(player.shameCount==8?(Math.round(player.shameTimer * 10) / 10).toFixed(1):player.shameCount)+"]",
-            fontSize: 20,
-            color: "#ffffff"
-        });
+        if(player.ticks > 0 || player.ticks > lastTick){//ticking
+            play({
+                xOffset: player.renderX,
+                yOffset: player.renderY,
+            });
+            lastTick = player.ticks;
+            renderText({
+                xOffset: player.renderX,
+                yOffset: player.renderY + player.scale + conf.nameY + 35,
+                text: "["+(primaryReloadCount==1?1:0)+","+(secondaryReloadCount==1?1:0)+","+(player.shameCount==8?(Math.round(player.shameTimer * 10) / 10).toFixed(1):player.shameCount)+","+Math.round(lastDir)+"]",
+                fontSize: 20,
+                color: "#ffffff"
+            });
+        }
+
     });
 
 });
