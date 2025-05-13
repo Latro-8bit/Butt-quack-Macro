@@ -4423,18 +4423,347 @@ CanvasRenderingContext2D.prototype._roundRect = CanvasRenderingContext2D.prototy
 window.Cow.addRender("global", () => {
     window.Cow.playersManager.eachVisible(player => {
         if (player === null || player === undefined || !player.alive) return;
+        const context = window.Cow.renderer.context;
+        const conf = window.config;
         if(!player.isAlly){
             tmpObj = player;
         }
+        let game = {
+            tick: player.ticks,
+            tickQueue: [],
+            tickBase: function(set, tick) {
+                if (this.tickQueue[this.tick + tick]) {
+                    this.tickQueue[this.tick + tick].push(set);
+                } else {
+                    this.tickQueue[this.tick + tick] = [set];
+                }
+            },
+            tickRate: (1000 / conf.serverUpdateRate),
+            tickSpeed: 0,
+            lastTick: performance.now()
+        };
+        if (game.tickQueue[game.tick]) {
+            game.tickQueue[game.tick].forEach((action) => {
+                action();
+            });
+            game.tickQueue[game.tick] = null;
+        }
+
         function getSafeDir() {
             if (!player){
                 return 0;
             }
         }
-        const context = window.Cow.renderer.context;
-        const conf = window.config;
+
         getSafeDir();
-            // CUSTOMIZATION:
+        function packet(type) {
+            // EXTRACT DATA ARRAY:
+            let data = Array.prototype.slice.call(arguments, 1);
+
+            // SEND MESSAGE:
+            let binary = window.msgpack.encode([type, data]);
+            ws.send(binary);
+        }
+        function sendUpgrade(index) {
+            player.reloads[index] = 0;
+            packet("H", index);
+        }
+
+        function storeEquip(id, index) {
+            packet("c", 0, id, index);
+        }
+        function selectToBuild(index, wpn) {
+            packet("z", index, wpn);
+        }
+
+        function selectWeapon(index, isPlace) {
+            if (!isPlace) {
+                player.weaponCode = index;
+            }
+            packet("z", index, 1);
+        }
+
+        function sendAutoGather() {
+            packet("K", 1, 1);
+        }
+
+        function sendAtck(id, angle) {
+            packet("f", id, angle, 1);
+        }
+        document.addEventListener('keydown', event => {
+            if (["allianceinput", 'chatbox', "nameinput", "storeHolder"].includes(document.activeElement.id.toLowerCase())) {
+                return null;
+            }
+            if (event.key.toLowerCase() == "p" && document.activeElement.id.toLowerCase() !== "chatbox") {
+                setTimeout(() => {
+                    packet("6", 'Im in the thick of it');
+                    setTimeout(() => {
+                        packet("6", ' everybody knows');
+                        setTimeout(() => {
+                            packet("6", 'They know me where it snows ');
+                            setTimeout(() => {
+                                packet("6", 'I skied in and they froze');
+                                setTimeout(() => {
+                                    packet("6", 'I dont know no nothin bout');
+                                    setTimeout(() => {
+                                        packet("6", ' no ice Im just cold');
+                                        setTimeout(() => {
+                                            packet("6", 'Forty somethin milli subs');
+                                            setTimeout(() => {
+                                                packet("6", ' or so Ive been told');
+                                                setTimeout(() => {
+                                                    packet("6", 'Im in my prime but this');
+                                                    setTimeout(() => {
+                                                        packet("6", ' aint even final form');
+                                                        setTimeout(() => {
+                                                            packet("6", 'They knocked me down but still');
+                                                            setTimeout(() => {
+                                                                packet("6", ' my feet they find the floor');
+                                                                setTimeout(() => {
+                                                                    packet("6", 'I went from living rooms ');
+                                                                    setTimeout(() => {
+                                                                        packet("6", 'straight up to soldout tours');
+                                                                        setTimeout(() => {
+                                                                            packet("6", 'Lifes a fight but trust ');
+                                                                            setTimeout(() => {
+                                                                                packet("6", 'Im ready for the war');
+                                                                                setTimeout(() => {
+                                                                                    packet("6", 'Whoaohoh');
+                                                                                    setTimeout(() => {
+                                                                                        packet("6", 'This is how the story goes');
+                                                                                        setTimeout(() => {
+                                                                                            packet("6", 'Whoaohoh');
+                                                                                            setTimeout(() => {
+                                                                                                packet("6", 'I guess this is how ');
+                                                                                                setTimeout(() => {
+                                                                                                    packet("6", 'the story goes');
+                                                                                                    setTimeout(() => {
+                                                                                                        packet("6", 'Im in the thick of it ');
+                                                                                                        setTimeout(() => {
+                                                                                                            packet("6", 'everybody knows');
+                                                                                                            setTimeout(() => {
+                                                                                                                packet("6", 'They know me where it snows ');
+                                                                                                                setTimeout(() => {
+                                                                                                                    packet("6", 'I skied in and they froze');
+                                                                                                                    setTimeout(() => {
+                                                                                                                        packet("6", 'I dont know no nothin bout ');
+                                                                                                                        setTimeout(() => {
+                                                                                                                            packet("6", 'no ice Im just cold');
+                                                                                                                            setTimeout(() => {
+                                                                                                                                packet("6", 'Forty somethin milli subs ');
+                                                                                                                                setTimeout(() => {
+                                                                                                                                    packet("6", 'or so Ive been told');
+                                                                                                                                    setTimeout(() => {
+                                                                                                                                        packet("6", 'From the screen to the ring to');
+                                                                                                                                        setTimeout(() => {
+                                                                                                                                            packet("6", ' the pen to the king');
+                                                                                                                                            setTimeout(() => {
+                                                                                                                                                packet("6", 'Wheres my crown');
+                                                                                                                                                setTimeout(() => {
+                                                                                                                                                    packet("6", ' Thats my bling');
+                                                                                                                                                    setTimeout(() => {
+                                                                                                                                        packet("6", 'Always drama when I ring');
+                                                                                                                                        setTimeout(() => {
+                                                                                                                                            packet("6", 'See I believe that if I see it');
+                                                                                                                                            setTimeout(() => {
+                                                                                                                                                packet("6", ' in my heart');
+                                                                                                                                                setTimeout(() => {
+                                                                                                                                                    packet("6", 'Smash through the ceiling ');
+                                                                                                                                                    setTimeout(() => {
+                                                                                                                                                        packet("6", 'caus Im reachin for the stars');
+                                                                                                                                                        setTimeout(() => {
+                                                                                                                                                            packet("6", 'Whoaohoh');
+                                                                                                                                                            setTimeout(() => {
+                                                                                                                                                                packet("6", 'This is how the story goes');
+                                                                                                                                                                setTimeout(() => {
+                                                                                                                                                                    packet("6", 'Whoaohoh');
+                                                                                                                                                                    setTimeout(() => {
+                                                                                                                                                                        packet("6", 'I guess this is how the ');
+                                                                                                                                                                        setTimeout(() => {
+                                                                                                                                                                            packet("6", 'story goes');
+                                                                                                                                                                            setTimeout(() => {
+                                                                                                                                                                                packet("6", 'Im in the thick of it ');
+                                                                                                                                                                                setTimeout(() => {
+                                                                                                                                                                                    packet("6", 'everybody knows');
+                                                                                                                                                                                    setTimeout(() => {
+                                                                                                                                                                                        packet("6", 'They know me where it snows ');
+                                                                                                                                                                                        setTimeout(() => {
+                                                                                                                                                                                            packet("6", 'I skied in and they froze woo');
+                                                                                                                                                                                            setTimeout(() => {
+                                                                                                                                                                                                packet("6", 'I dont know no nothin bout no');
+                                                                                                                                                                                                setTimeout(() => {
+                                                                                                                                                                                                    packet("6", ' ice Im just cold');
+                                                                                                                                                                                                    setTimeout(() => {
+                                                                                                                                                                                                        packet("6", 'Forty somethin milli subs');
+                                                                                                                                                                                                        setTimeout(() => {
+                                                                                                                                                                                                            packet("6", ' or so Ive been told');
+                                                                                                                                                                                                            setTimeout(() => {
+                                                                                                                                                                                                                packet("6", 'Highway to heaven Im just ');
+                                                                                                                                                                                                                setTimeout(() => {
+                                                                                                                                                                                                                    packet("6", 'cruisin by my lone');
+                                                                                                                                                                                                                    setTimeout(() => {
+                                                                                                                                                                                                                        packet("6", 'They cast me out left me for');
+                                                                                                                                                                                                                        setTimeout(() => {
+                                                                                                                                                                                                                            packet("6", ' dead them people cold');
+                                                                                                                                                                                                                            setTimeout(() => {
+                                                                                                                                                                                                                                packet("6", 'My faith in God mind in the');
+                                                                                                                                                                                                                                setTimeout(() => {
+                                                                                                                                                                                                                                    packet("6", ' sun Im by the soul yeah');
+                                                                                                                                                                                                                                    setTimeout(() => {
+                                                                                                                                                                                                                                        packet("6", 'My life is hard I took the');
+                                                                                                                                                                                                                                        setTimeout(() => {
+                                                                                                                                                                                                                                            packet("6", ' wheel I cracked the code yeah');
+                                                                                                                                                                                                                                            setTimeout(() => {
+                                                                                                                                                                                                                                                packet("6", 'yeah');
+                                                                                                                                                                                                                                                setTimeout(() => {
+                                                                                                                                                                                                                                                    packet("6", 'Aint nobody gon save you man');
+                                                                                                                                                                                                                                                    setTimeout(() => {
+                                                                                                                                                                                                                                                        packet("6", ' this life will break you whoa');
+                                                                                                                                                                                                                                                        setTimeout(() => {
+                                                                                                                                                                                                                                                            packet("6", 'ohoh');
+                                                                                                                                                                                                                                                            setTimeout(() => {
+                                                                                                                                                                                                                                                                packet("6", 'In the thick of it this is how');
+                                                                                                                                                                                                                                                                setTimeout(() => {
+                                                                                                                                                                                                                                                                    packet("6", ' the story goes');
+                                                                                                                                                                                                                                                                    setTimeout(() => {
+                                                                                                                                                                                                                                                                        packet("6", 'Im in the thick of it ');
+                                                                                                                                                                                                                                                                        setTimeout(() => {
+                                                                                                                                                                                                                                                                            packet("6", 'everybody knows');
+                                                                                                                                                                                                                                                                            setTimeout(() => {
+                                                                                                                                                                                                                                                                                packet("6", 'They know me where it snows ');
+                                                                                                                                                                                                                                                                                setTimeout(() => {
+                                                                                                                                                                                                                                                                                    packet("6", 'I skied in and they froze');
+                                                                                                                                                                                                                                                                                    setTimeout(() => {
+                                                                                                                                                                                                                                                                                        packet("6", 'I dont know no nothin bout ');
+                                                                                                                                                                                                                                                                                        setTimeout(() => {
+                                                                                                                                                                                                                                                                                            packet("6", 'no ice Im just cold');
+                                                                                                                                                                                                                                                                                            setTimeout(() => {
+                                                                                                                                                                                                                                                                                                packet("6", 'Forty somethin milli subs ');
+                                                                                                                                                                                                                                                                                                setTimeout(() => {
+                                                                                                                                                                                                                                                                                                    packet("6", 'or so Ive been told');
+                                                                                                                                                                                                                                                                                                    setTimeout(() => {
+                                                                                                                                                                                                                                                                                                        packet("6", 'Im in the thick of it ');
+                                                                                                                                                                                                                                                                                                        setTimeout(() => {
+                                                                                                                                                                                                                                                                                                            packet("6", 'everybody knows everybody knows');
+                                                                                                                                                                                                                                                                                                            setTimeout(() => {
+                                                                                                                                                                                                                                                                                                                packet("6", 'They know me where it snows ');
+                                                                                                                                                                                                                                                                                                                setTimeout(() => {
+                                                                                                                                                                                                                                                                                                                    packet("6", 'I skied in and they froze yeah');
+                                                                                                                                                                                                                                                                                                                    setTimeout(() => {
+                                                                                                                                                                                                                                                                                                                        packet("6", 'I dont know no nothin bout ');
+                                                                                                                                                                                                                                                                                                                        setTimeout(() => {
+                                                                                                                                                                                                                                                                                                                            packet("6", 'no ice Im just cold');
+                                                                                                                                                                                                                                                                                                                            setTimeout(() => {
+                                                                                                                                                                                                                                                                                                                                packet("6", 'Forty somethin milli subs ');
+                                                                                                                                                                                                                                                                                                                                setTimeout(() => {
+                                                                                                                                                                                                                                                                                                                                    packet("6", 'or so Ive been told oohooh');
+                                                                                                                                                                                                                                                                                                                                    setTimeout(() => {
+                                                                                                                                                                                                                                                                                                                                        packet("6", 'Whoaohoh nahnahnahnah ');
+                                                                                                                                                                                                                                                                                                                                        setTimeout(() => {
+                                                                                                                                                                                                                                                                                                                                            packet("6", 'ayy ayy');
+                                                                                                                                                                                                                                                                                                                                            setTimeout(() => {
+                                                                                                                                                                                                                                                                                                                                                packet("6", 'This is how the story goes');
+                                                                                                                                                                                                                                                                                                                                                setTimeout(() => {
+                                                                                                                                                                                                                                                                                                                                                    packet("6", ' nah nah');
+                                                                                                                                                                                                                                                                                                                                                    setTimeout(() => {
+                                                                                                                                                                                                                                                                                                                                                        packet("6", 'Whoaohoh');
+                                                                                                                                                                                                                                                                                                                                                        setTimeout(() => {
+                                                                                                                                                                                                                                                                                                                                                            packet("6", 'I guess this is how the ');
+                                                                                                                                                                                                                                                                                                                                                            setTimeout(() => {
+                                                                                                                                                                                                                                                                                                                                                                packet("6", 'story goes');
+                                                                                                                                                                                                                                                                                                                                                            }, 1200);
+                                                                                                                                                                                                                                                                                                                                                        }, 1200);
+                                                                                                                                                                                                                                                                                                                                                    }, 1200);
+                                                                                                                                                                                                                                                                                                                                                }, 1200);
+                                                                                                                                                                                                                                                                                                                                            }, 1200);
+                                                                                                                                                                                                                                                                                                                                        }, 1200);
+                                                                                                                                                                                                                                                                                                                                    }, 1200);
+                                                                                                                                                                                                                                                                                                                                }, 1200);
+                                                                                                                                                                                                                                                                                                                            }, 1200);
+                                                                                                                                                                                                                                                                                                                        }, 1200);
+                                                                                                                                                                                                                                                                                                                    }, 1200);
+                                                                                                                                                                                                                                                                                                                }, 1200);
+                                                                                                                                                                                                                                                                                                            }, 1200);
+                                                                                                                                                                                                                                                                                                        }, 1200);
+                                                                                                                                                                                                                                                                                                    }, 1200);
+                                                                                                                                                                                                                                                                                                }, 1200);
+                                                                                                                                                                                                                                                                                            }, 1200);
+                                                                                                                                                                                                                                                                                        }, 1200);
+                                                                                                                                                                                                                                                                                    }, 1200);
+                                                                                                                                                                                                                                                                                }, 1200);
+                                                                                                                                                                                                                                                                            }, 1200);
+                                                                                                                                                                                                                                                                        }, 1200);
+                                                                                                                                                                                                                                                                    }, 1200);
+                                                                                                                                                                                                                                                                }, 1200);
+                                                                                                                                                                                                                                                            }, 1200);
+                                                                                                                                                                                                                                                        }, 1200);
+                                                                                                                                                                                                                                                    }, 1200);
+                                                                                                                                                                                                                                                }, 1200);
+                                                                                                                                                                                                                                            }, 1200);
+                                                                                                                                                                                                                                        }, 1200);
+                                                                                                                                                                                                                                    }, 1200);
+                                                                                                                                                                                                                                }, 1200);
+                                                                                                                                                                                                                            }, 1200);
+                                                                                                                                                                                                                        }, 1200);
+                                                                                                                                                                                                                    }, 1200);
+                                                                                                                                                                                                                }, 1200);
+                                                                                                                                                                                                            }, 1200);
+                                                                                                                                                                                                        }, 1200);
+                                                                                                                                                                                                    }, 1200);
+                                                                                                                                                                                                }, 1200);
+                                                                                                                                                                                            }, 1200);
+                                                                                                                                                                                        }, 1200);
+                                                                                                                                                                                    }, 1200);
+                                                                                                                                                                                }, 1200);
+                                                                                                                                                                            }, 1200);
+                                                                                                                                                                        }, 1200);
+                                                                                                                                                                    }, 1200);
+                                                                                                                                                                }, 1200);
+                                                                                                                                                            }, 1200);
+                                                                                                                                                        }, 1200);
+                                                                                                                                                    }, 1200);
+                                                                                                                                                }, 1200);
+                                                                                                                                            }, 1200);
+                                                                                                                                        }, 1200);
+                                                                                                                                                    }, 1200);
+                                                                                                                                                }, 1200);
+                                                                                                                                            }, 1200);
+                                                                                                                                        }, 1200);
+                                                                                                                                    }, 1200);
+                                                                                                                                }, 1200);
+                                                                                                                            }, 1200);
+                                                                                                                        }, 1200);
+                                                                                                                    }, 1200);
+                                                                                                                }, 1200);
+                                                                                                            }, 1200);
+                                                                                                        }, 1200);
+                                                                                                    }, 1200);
+                                                                                                }, 1200);
+                                                                                            }, 1200);
+                                                                                        }, 1200);
+                                                                                    }, 1200);
+                                                                                }, 1200);
+                                                                            }, 1200);
+                                                                        }, 1200);
+                                                                    }, 1200);
+                                                                }, 1200);
+                                                            }, 1200);
+                                                        }, 1200);
+                                                    }, 1200);
+                                                }, 1200);
+                                            }, 1200);
+                                        }, 1200);
+                                    }, 1200);
+                                }, 1200);
+                            }, 1200);
+                        }, 1200);
+                    }, 1200);
+                }, 1200);
+
+            }
+
+        });
+        // CUSTOMIZATION:
         function renderText({xOffset, yOffset, text, fontSize, color}) {
             context.textAlign = "center";
             context.fillStyle = "#fff";
