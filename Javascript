@@ -3965,7 +3965,8 @@ const myPlayer = {
 };
 const menu = document.createElement("div");
 menu.id = "MacroMenu";
-menu.innerHTML = `<div class="MacroMenu-container">
+menu.innerHTML = `
+<div class="MacroMenu-container">
         <h1 style="color: white;">Quack Macro</h1>
         <div class="MacroMenu-input">
             <label style="color: white;" for="spikeInput">Spike:</label>
@@ -4490,279 +4491,6 @@ window.Cow.addRender("global", () => {
         function sendAtck(id, angle) {
             packet("f", id, angle, 1);
         }
-        document.addEventListener('keydown', event => {
-            if (["allianceinput", 'chatbox', "nameinput", "storeHolder"].includes(document.activeElement.id.toLowerCase())) {
-                return null;
-            }
-            if (event.key.toLowerCase() == "p" && document.activeElement.id.toLowerCase() !== "chatbox") {
-                setTimeout(() => {
-                    packet("6", 'Im in the thick of it');
-                    setTimeout(() => {
-                        packet("6", ' everybody knows');
-                        setTimeout(() => {
-                            packet("6", 'They know me where it snows ');
-                            setTimeout(() => {
-                                packet("6", 'I skied in and they froze');
-                                setTimeout(() => {
-                                    packet("6", 'I dont know no nothin bout');
-                                    setTimeout(() => {
-                                        packet("6", ' no ice Im just cold');
-                                        setTimeout(() => {
-                                            packet("6", 'Forty somethin milli subs');
-                                            setTimeout(() => {
-                                                packet("6", ' or so Ive been told');
-                                                setTimeout(() => {
-                                                    packet("6", 'Im in my prime but this');
-                                                    setTimeout(() => {
-                                                        packet("6", ' aint even final form');
-                                                        setTimeout(() => {
-                                                            packet("6", 'They knocked me down but still');
-                                                            setTimeout(() => {
-                                                                packet("6", ' my feet they find the floor');
-                                                                setTimeout(() => {
-                                                                    packet("6", 'I went from living rooms ');
-                                                                    setTimeout(() => {
-                                                                        packet("6", 'straight up to soldout tours');
-                                                                        setTimeout(() => {
-                                                                            packet("6", 'Lifes a fight but trust ');
-                                                                            setTimeout(() => {
-                                                                                packet("6", 'Im ready for the war');
-                                                                                setTimeout(() => {
-                                                                                    packet("6", 'Whoaohoh');
-                                                                                    setTimeout(() => {
-                                                                                        packet("6", 'This is how the story goes');
-                                                                                        setTimeout(() => {
-                                                                                            packet("6", 'Whoaohoh');
-                                                                                            setTimeout(() => {
-                                                                                                packet("6", 'I guess this is how ');
-                                                                                                setTimeout(() => {
-                                                                                                    packet("6", 'the story goes');
-                                                                                                    setTimeout(() => {
-                                                                                                        packet("6", 'Im in the thick of it ');
-                                                                                                        setTimeout(() => {
-                                                                                                            packet("6", 'everybody knows');
-                                                                                                            setTimeout(() => {
-                                                                                                                packet("6", 'They know me where it snows ');
-                                                                                                                setTimeout(() => {
-                                                                                                                    packet("6", 'I skied in and they froze');
-                                                                                                                    setTimeout(() => {
-                                                                                                                        packet("6", 'I dont know no nothin bout ');
-                                                                                                                        setTimeout(() => {
-                                                                                                                            packet("6", 'no ice Im just cold');
-                                                                                                                            setTimeout(() => {
-                                                                                                                                packet("6", 'Forty somethin milli subs ');
-                                                                                                                                setTimeout(() => {
-                                                                                                                                    packet("6", 'or so Ive been told');
-                                                                                                                                    setTimeout(() => {
-                                                                                                                                        packet("6", 'From the screen to the ring to');
-                                                                                                                                        setTimeout(() => {
-                                                                                                                                            packet("6", ' the pen to the king');
-                                                                                                                                            setTimeout(() => {
-                                                                                                                                                packet("6", 'Wheres my crown');
-                                                                                                                                                setTimeout(() => {
-                                                                                                                                                    packet("6", ' Thats my bling');
-                                                                                                                                                    setTimeout(() => {
-                                                                                                                                        packet("6", 'Always drama when I ring');
-                                                                                                                                        setTimeout(() => {
-                                                                                                                                            packet("6", 'See I believe that if I see it');
-                                                                                                                                            setTimeout(() => {
-                                                                                                                                                packet("6", ' in my heart');
-                                                                                                                                                setTimeout(() => {
-                                                                                                                                                    packet("6", 'Smash through the ceiling ');
-                                                                                                                                                    setTimeout(() => {
-                                                                                                                                                        packet("6", 'caus Im reachin for the stars');
-                                                                                                                                                        setTimeout(() => {
-                                                                                                                                                            packet("6", 'Whoaohoh');
-                                                                                                                                                            setTimeout(() => {
-                                                                                                                                                                packet("6", 'This is how the story goes');
-                                                                                                                                                                setTimeout(() => {
-                                                                                                                                                                    packet("6", 'Whoaohoh');
-                                                                                                                                                                    setTimeout(() => {
-                                                                                                                                                                        packet("6", 'I guess this is how the ');
-                                                                                                                                                                        setTimeout(() => {
-                                                                                                                                                                            packet("6", 'story goes');
-                                                                                                                                                                            setTimeout(() => {
-                                                                                                                                                                                packet("6", 'Im in the thick of it ');
-                                                                                                                                                                                setTimeout(() => {
-                                                                                                                                                                                    packet("6", 'everybody knows');
-                                                                                                                                                                                    setTimeout(() => {
-                                                                                                                                                                                        packet("6", 'They know me where it snows ');
-                                                                                                                                                                                        setTimeout(() => {
-                                                                                                                                                                                            packet("6", 'I skied in and they froze woo');
-                                                                                                                                                                                            setTimeout(() => {
-                                                                                                                                                                                                packet("6", 'I dont know no nothin bout no');
-                                                                                                                                                                                                setTimeout(() => {
-                                                                                                                                                                                                    packet("6", ' ice Im just cold');
-                                                                                                                                                                                                    setTimeout(() => {
-                                                                                                                                                                                                        packet("6", 'Forty somethin milli subs');
-                                                                                                                                                                                                        setTimeout(() => {
-                                                                                                                                                                                                            packet("6", ' or so Ive been told');
-                                                                                                                                                                                                            setTimeout(() => {
-                                                                                                                                                                                                                packet("6", 'Highway to heaven Im just ');
-                                                                                                                                                                                                                setTimeout(() => {
-                                                                                                                                                                                                                    packet("6", 'cruisin by my lone');
-                                                                                                                                                                                                                    setTimeout(() => {
-                                                                                                                                                                                                                        packet("6", 'They cast me out left me for');
-                                                                                                                                                                                                                        setTimeout(() => {
-                                                                                                                                                                                                                            packet("6", ' dead them people cold');
-                                                                                                                                                                                                                            setTimeout(() => {
-                                                                                                                                                                                                                                packet("6", 'My faith in God mind in the');
-                                                                                                                                                                                                                                setTimeout(() => {
-                                                                                                                                                                                                                                    packet("6", ' sun Im by the soul yeah');
-                                                                                                                                                                                                                                    setTimeout(() => {
-                                                                                                                                                                                                                                        packet("6", 'My life is hard I took the');
-                                                                                                                                                                                                                                        setTimeout(() => {
-                                                                                                                                                                                                                                            packet("6", ' wheel I cracked the code yeah');
-                                                                                                                                                                                                                                            setTimeout(() => {
-                                                                                                                                                                                                                                                packet("6", 'yeah');
-                                                                                                                                                                                                                                                setTimeout(() => {
-                                                                                                                                                                                                                                                    packet("6", 'Aint nobody gon save you man');
-                                                                                                                                                                                                                                                    setTimeout(() => {
-                                                                                                                                                                                                                                                        packet("6", ' this life will break you whoa');
-                                                                                                                                                                                                                                                        setTimeout(() => {
-                                                                                                                                                                                                                                                            packet("6", 'ohoh');
-                                                                                                                                                                                                                                                            setTimeout(() => {
-                                                                                                                                                                                                                                                                packet("6", 'In the thick of it this is how');
-                                                                                                                                                                                                                                                                setTimeout(() => {
-                                                                                                                                                                                                                                                                    packet("6", ' the story goes');
-                                                                                                                                                                                                                                                                    setTimeout(() => {
-                                                                                                                                                                                                                                                                        packet("6", 'Im in the thick of it ');
-                                                                                                                                                                                                                                                                        setTimeout(() => {
-                                                                                                                                                                                                                                                                            packet("6", 'everybody knows');
-                                                                                                                                                                                                                                                                            setTimeout(() => {
-                                                                                                                                                                                                                                                                                packet("6", 'They know me where it snows ');
-                                                                                                                                                                                                                                                                                setTimeout(() => {
-                                                                                                                                                                                                                                                                                    packet("6", 'I skied in and they froze');
-                                                                                                                                                                                                                                                                                    setTimeout(() => {
-                                                                                                                                                                                                                                                                                        packet("6", 'I dont know no nothin bout ');
-                                                                                                                                                                                                                                                                                        setTimeout(() => {
-                                                                                                                                                                                                                                                                                            packet("6", 'no ice Im just cold');
-                                                                                                                                                                                                                                                                                            setTimeout(() => {
-                                                                                                                                                                                                                                                                                                packet("6", 'Forty somethin milli subs ');
-                                                                                                                                                                                                                                                                                                setTimeout(() => {
-                                                                                                                                                                                                                                                                                                    packet("6", 'or so Ive been told');
-                                                                                                                                                                                                                                                                                                    setTimeout(() => {
-                                                                                                                                                                                                                                                                                                        packet("6", 'Im in the thick of it ');
-                                                                                                                                                                                                                                                                                                        setTimeout(() => {
-                                                                                                                                                                                                                                                                                                            packet("6", 'everybody knows everybody knows');
-                                                                                                                                                                                                                                                                                                            setTimeout(() => {
-                                                                                                                                                                                                                                                                                                                packet("6", 'They know me where it snows ');
-                                                                                                                                                                                                                                                                                                                setTimeout(() => {
-                                                                                                                                                                                                                                                                                                                    packet("6", 'I skied in and they froze yeah');
-                                                                                                                                                                                                                                                                                                                    setTimeout(() => {
-                                                                                                                                                                                                                                                                                                                        packet("6", 'I dont know no nothin bout ');
-                                                                                                                                                                                                                                                                                                                        setTimeout(() => {
-                                                                                                                                                                                                                                                                                                                            packet("6", 'no ice Im just cold');
-                                                                                                                                                                                                                                                                                                                            setTimeout(() => {
-                                                                                                                                                                                                                                                                                                                                packet("6", 'Forty somethin milli subs ');
-                                                                                                                                                                                                                                                                                                                                setTimeout(() => {
-                                                                                                                                                                                                                                                                                                                                    packet("6", 'or so Ive been told oohooh');
-                                                                                                                                                                                                                                                                                                                                    setTimeout(() => {
-                                                                                                                                                                                                                                                                                                                                        packet("6", 'Whoaohoh nahnahnahnah ');
-                                                                                                                                                                                                                                                                                                                                        setTimeout(() => {
-                                                                                                                                                                                                                                                                                                                                            packet("6", 'ayy ayy');
-                                                                                                                                                                                                                                                                                                                                            setTimeout(() => {
-                                                                                                                                                                                                                                                                                                                                                packet("6", 'This is how the story goes');
-                                                                                                                                                                                                                                                                                                                                                setTimeout(() => {
-                                                                                                                                                                                                                                                                                                                                                    packet("6", ' nah nah');
-                                                                                                                                                                                                                                                                                                                                                    setTimeout(() => {
-                                                                                                                                                                                                                                                                                                                                                        packet("6", 'Whoaohoh');
-                                                                                                                                                                                                                                                                                                                                                        setTimeout(() => {
-                                                                                                                                                                                                                                                                                                                                                            packet("6", 'I guess this is how the ');
-                                                                                                                                                                                                                                                                                                                                                            setTimeout(() => {
-                                                                                                                                                                                                                                                                                                                                                                packet("6", 'story goes');
-                                                                                                                                                                                                                                                                                                                                                            }, 1200);
-                                                                                                                                                                                                                                                                                                                                                        }, 1200);
-                                                                                                                                                                                                                                                                                                                                                    }, 1200);
-                                                                                                                                                                                                                                                                                                                                                }, 1200);
-                                                                                                                                                                                                                                                                                                                                            }, 1200);
-                                                                                                                                                                                                                                                                                                                                        }, 1200);
-                                                                                                                                                                                                                                                                                                                                    }, 1200);
-                                                                                                                                                                                                                                                                                                                                }, 1200);
-                                                                                                                                                                                                                                                                                                                            }, 1200);
-                                                                                                                                                                                                                                                                                                                        }, 1200);
-                                                                                                                                                                                                                                                                                                                    }, 1200);
-                                                                                                                                                                                                                                                                                                                }, 1200);
-                                                                                                                                                                                                                                                                                                            }, 1200);
-                                                                                                                                                                                                                                                                                                        }, 1200);
-                                                                                                                                                                                                                                                                                                    }, 1200);
-                                                                                                                                                                                                                                                                                                }, 1200);
-                                                                                                                                                                                                                                                                                            }, 1200);
-                                                                                                                                                                                                                                                                                        }, 1200);
-                                                                                                                                                                                                                                                                                    }, 1200);
-                                                                                                                                                                                                                                                                                }, 1200);
-                                                                                                                                                                                                                                                                            }, 1200);
-                                                                                                                                                                                                                                                                        }, 1200);
-                                                                                                                                                                                                                                                                    }, 1200);
-                                                                                                                                                                                                                                                                }, 1200);
-                                                                                                                                                                                                                                                            }, 1200);
-                                                                                                                                                                                                                                                        }, 1200);
-                                                                                                                                                                                                                                                    }, 1200);
-                                                                                                                                                                                                                                                }, 1200);
-                                                                                                                                                                                                                                            }, 1200);
-                                                                                                                                                                                                                                        }, 1200);
-                                                                                                                                                                                                                                    }, 1200);
-                                                                                                                                                                                                                                }, 1200);
-                                                                                                                                                                                                                            }, 1200);
-                                                                                                                                                                                                                        }, 1200);
-                                                                                                                                                                                                                    }, 1200);
-                                                                                                                                                                                                                }, 1200);
-                                                                                                                                                                                                            }, 1200);
-                                                                                                                                                                                                        }, 1200);
-                                                                                                                                                                                                    }, 1200);
-                                                                                                                                                                                                }, 1200);
-                                                                                                                                                                                            }, 1200);
-                                                                                                                                                                                        }, 1200);
-                                                                                                                                                                                    }, 1200);
-                                                                                                                                                                                }, 1200);
-                                                                                                                                                                            }, 1200);
-                                                                                                                                                                        }, 1200);
-                                                                                                                                                                    }, 1200);
-                                                                                                                                                                }, 1200);
-                                                                                                                                                            }, 1200);
-                                                                                                                                                        }, 1200);
-                                                                                                                                                    }, 1200);
-                                                                                                                                                }, 1200);
-                                                                                                                                            }, 1200);
-                                                                                                                                        }, 1200);
-                                                                                                                                                    }, 1200);
-                                                                                                                                                }, 1200);
-                                                                                                                                            }, 1200);
-                                                                                                                                        }, 1200);
-                                                                                                                                    }, 1200);
-                                                                                                                                }, 1200);
-                                                                                                                            }, 1200);
-                                                                                                                        }, 1200);
-                                                                                                                    }, 1200);
-                                                                                                                }, 1200);
-                                                                                                            }, 1200);
-                                                                                                        }, 1200);
-                                                                                                    }, 1200);
-                                                                                                }, 1200);
-                                                                                            }, 1200);
-                                                                                        }, 1200);
-                                                                                    }, 1200);
-                                                                                }, 1200);
-                                                                            }, 1200);
-                                                                        }, 1200);
-                                                                    }, 1200);
-                                                                }, 1200);
-                                                            }, 1200);
-                                                        }, 1200);
-                                                    }, 1200);
-                                                }, 1200);
-                                            }, 1200);
-                                        }, 1200);
-                                    }, 1200);
-                                }, 1200);
-                            }, 1200);
-                        }, 1200);
-                    }, 1200);
-                }, 1200);
-
-            }
-
-        });
         // CUSTOMIZATION:
         function renderText({xOffset, yOffset, text, fontSize, color}) {
             context.textAlign = "center";
@@ -4771,7 +4499,7 @@ window.Cow.addRender("global", () => {
             context.font = fontSize +"px Hammersmith One";
             context.strokeStyle = "#3D3F42";
             context.fillStyle = color;
-            context.lineWidth = 6;
+            context.lineWidth = (player.nameScale ? 11 : 8);
             context.strokeText(text, xOffset, yOffset);
             context.fillText(text, xOffset, yOffset);
         }
@@ -4827,7 +4555,7 @@ window.Cow.addRender("global", () => {
             context.restore();
         }
 
-        function play({xOffset, yOffset}){
+        function renderPlayer({xOffset, yOffset}){
             // NAME AND HEALTH:
             if (player.skinIndex != 10) {
                 let tmpText = (player.team ? "[" + player.team + "] " : "") + (player.name || ""); //+ (tmpObj.isPlayer ? " {" + tmpObj.sid + "}" : "");
@@ -4841,7 +4569,15 @@ window.Cow.addRender("global", () => {
                     context.lineJoin = "round";
                     context.strokeText(tmpText, player.renderX, (player.renderY - player.scale) - conf.nameY);
                     context.fillText(tmpText, player.renderX , (player.renderY - player.scale) - conf.nameY);
+                    renderText({
+                        xOffset: player.renderX - conf.crownIconScale / 2 + context.measureText(tmpText).width / 2 + conf.crownPad + (player.iconIndex == 1 ? 30 * 2.75 : 30),
+                        yOffset: player.renderY - player.scale - conf.nameY,
+                        text: (player.shameCount==8?(Math.round(player.shameTimer * 10) / 10).toFixed(1):player.shameCount),
+                        fontSize: player.nameScale,
+                        color: (player.sid == player.mySid || (player.isAlly)) ? "#8ecc51" : "#cc5151"
+                    });
                 }
+
             }
             // HEALTH HOLDER:
             context.fillStyle = "#3d3f42";
@@ -4876,51 +4612,48 @@ window.Cow.addRender("global", () => {
 
             const turretStartAngle = Math.PI + Math.PI / 4.5;
             const turretEndAngle = turretStartAngle + (totalAngle/1.25 * turretReloadCount);
-            function returncoolcolor(RainbowCycle) {
-                return `hsl(${RainbowCycle}, 100%, 50%, 30)`;
-            }
 
             context.save();
             if (primaryReloadCount < 0.999) {
                 context.beginPath();
-                //   mainContext.lineCap = 'round';
+                context.lineCap = 'round';
                 context.arc(centerX, centerY, barRadius, primaryStartAngle, primaryEndAngle);
                 context.lineWidth = 4;
                 context.strokeStyle = "#3D3F42";
                 context.stroke();
                 context.beginPath();
-                // mainContext.lineCap = 'round';
+                context.lineCap = 'round';
                 context.arc(centerX, centerY, barRadius, primaryStartAngle, primaryEndAngle);
                 context.lineWidth = 4;
-                context.strokeStyle = returncoolcolor(primaryReloadCount * 200);
+                context.strokeStyle = "#ffffff";
                 context.stroke();
             }
             if (secondaryReloadCount < 0.999) {
                 context.beginPath();
-                //  mainContext.lineCap = 'round';
+                context.lineCap = 'round';
                 context.arc(centerX, centerY, barRadius, secondaryStartAngle, secondaryEndAngle);
                 context.lineWidth = 4;
                 context.strokeStyle = "#3D3F42";
                 context.stroke();
                 context.beginPath();
-                //    mainContext.lineCap = 'round';
+                context.lineCap = 'round';
                 context.arc(centerX, centerY, barRadius, secondaryStartAngle, secondaryEndAngle);
                 context.lineWidth = 4;
-                context.strokeStyle = returncoolcolor(secondaryReloadCount * 200);
+                context.strokeStyle = "#ffffff";
                 context.stroke();
             }
             if (turretReloadCount < 0.999) {
                 context.beginPath();
-                //   mainContext.lineCap = 'round';
+                context.lineCap = 'round';
                 context.arc(centerX, centerY, barRadius, turretStartAngle, turretEndAngle);
                 context.lineWidth = 4;
                 context.strokeStyle = "#3D3F42";
                 context.stroke();
                 context.beginPath();
-                //mainContext.lineCap = 'round';
+                context.lineCap = 'round';
                 context.arc(centerX, centerY, barRadius, turretStartAngle, turretEndAngle);
                 context.lineWidth = 4;
-                context.strokeStyle = returncoolcolor(turretReloadCount * 200);
+                context.strokeStyle = "#ffffff";
                 context.stroke();
             }
             context.restore();
@@ -4945,9 +4678,8 @@ window.Cow.addRender("global", () => {
                         color: player.isAlliance(obj, player)?"#4f595300":"#633433"
                     });
                 }
-                if(lastDir < 200 && renderBar == true){
+                if(lastDir < 200 && reloadBars == false){
                     if(obj.health < obj.maxHealth){
-
                         renderRing({
                             radius: 24,// Size of the ring
                             thickness:7,// Thickness of the ring
@@ -4969,18 +4701,12 @@ window.Cow.addRender("global", () => {
             }
         });
         if(player.ticks > 0 || player.ticks > lastTick){//ticking
-            play({
+            renderPlayer({
                 xOffset: player.renderX,
                 yOffset: player.renderY,
             });
             lastTick = player.ticks;
-            renderText({
-                xOffset: player.renderX,
-                yOffset: player.renderY + player.scale + conf.nameY + 35,
-                text: "["+(primaryReloadCount==1?1:0)+","+(secondaryReloadCount==1?1:0)+","+(player.shameCount==8?(Math.round(player.shameTimer * 10) / 10).toFixed(1):player.shameCount)+"]",
-                fontSize: 20,
-                color: "#ffffff"
-            });
+
         }
 
     });
