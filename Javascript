@@ -4599,7 +4599,7 @@ window.Cow.addRender("global", () => {
         const turretReloadCount = player.reloads.turret.count / player.reloads.turret.max;
         const yOffset = player.renderY + player.scale + conf.nameY - 5;
         //reloadsing
-        if(reloadBars == true){
+        if(visual == true){
             const centerX = player.renderX;
             const centerY = player.renderY;
             const barRadius = 35;
@@ -4625,7 +4625,7 @@ window.Cow.addRender("global", () => {
                 context.lineCap = 'round';
                 context.arc(centerX, centerY, barRadius, primaryStartAngle, primaryEndAngle);
                 context.lineWidth = 4;
-                context.strokeStyle = "#ffffff";
+                context.strokeStyle = "#ffffff55";
                 context.stroke();
             }
             if (secondaryReloadCount < 0.999) {
@@ -4639,7 +4639,7 @@ window.Cow.addRender("global", () => {
                 context.lineCap = 'round';
                 context.arc(centerX, centerY, barRadius, secondaryStartAngle, secondaryEndAngle);
                 context.lineWidth = 4;
-                context.strokeStyle = "#ffffff";
+                context.strokeStyle = "#ffffff55";
                 context.stroke();
             }
             if (turretReloadCount < 0.999) {
@@ -4653,7 +4653,7 @@ window.Cow.addRender("global", () => {
                 context.lineCap = 'round';
                 context.arc(centerX, centerY, barRadius, turretStartAngle, turretEndAngle);
                 context.lineWidth = 4;
-                context.strokeStyle = "#ffffff";
+                context.strokeStyle = "#ffffff55";
                 context.stroke();
             }
             context.restore();
@@ -4678,7 +4678,7 @@ window.Cow.addRender("global", () => {
                         color: player.isAlliance(obj, player)?"#4f595300":"#633433"
                     });
                 }
-                if(lastDir < 200 && reloadBars == false){
+                if(lastDir < 200 && reloadBars == true){
                     if(obj.health < obj.maxHealth){
                         renderRing({
                             radius: 24,// Size of the ring
@@ -4699,6 +4699,10 @@ window.Cow.addRender("global", () => {
 
                 }
             }
+            renderPlayer({
+                xOffset: player.renderX,
+                yOffset: player.renderY,
+            });
         });
         if(player.ticks > 0 || player.ticks > lastTick){//ticking
             renderPlayer({
